@@ -1,5 +1,5 @@
 ============================================== 
-Update started: 2026/08/18 19:51:37.43 
-Folder: V:\AI\北爪\ツール更新\randy-step-tracker 
+Update started: 2026/08/18 19:54:37.73 
+Folder: U:\AI\北爪\ツール更新\randy-step-tracker 
 ============================================== 
 User chose not to overwrite index.html. 
