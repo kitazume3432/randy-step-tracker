@@ -248,64 +248,8 @@
         <div class="sub">土地探しから土地契約までの5ステップで、ランディ登録中のお客様（土地なし・削除客）の進捗を確認・更新できます</div>
       </div>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <button class="add-btn" id="addBtn">＋ お客様を追加</button>
-      <button id="ghSettingsBtn" style="padding:10px 14px; border-radius:9px; border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:12.5px; cursor:pointer;">⚙️ GitHub連携設定</button>
-    </div>
+    <button class="add-btn" id="addBtn">＋ お客様を追加</button>
   </header>
-
-  <div id="ghSettingsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:12px; padding:22px 24px; width:92%; max-width:420px; box-shadow:0 8px 30px rgba(0,0,0,0.2);">
-      <h3 style="margin:0 0 6px; font-size:16px; color:var(--orange-deep);">GitHub連携設定</h3>
-      <p style="font-size:12px; color:var(--ink-soft); margin:0 0 14px; line-height:1.6;">
-        複数スタッフでデータを共有するために使います。この端末のブラウザにのみ保存され、他のスタッフには共有されません。<br>
-        トークンをまだ持っていない場合は、GitHubの管理者（北爪）に発行を依頼してください。
-      </p>
-      <label style="font-size:12px; color:var(--ink-soft); display:block; margin-bottom:4px;">Personal Access Token</label>
-      <input type="password" id="ghTokenInput" placeholder="ghp_..." style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; margin-bottom:10px; font-size:13px;">
-      <label style="font-size:12px; color:var(--ink-soft); display:block; margin-bottom:4px;">リポジトリ（owner/repo）</label>
-      <input type="text" id="ghRepoInput" style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; margin-bottom:10px; font-size:13px;">
-      <label style="font-size:12px; color:var(--ink-soft); display:block; margin-bottom:4px;">ブランチ</label>
-      <input type="text" id="ghBranchInput" style="width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; margin-bottom:16px; font-size:13px;">
-      <div id="ghSettingsStatus" style="font-size:12px; color:var(--orange-deep); min-height:16px; margin-bottom:8px;"></div>
-      <div style="display:flex; justify-content:flex-end; gap:8px;">
-        <button id="ghSettingsCancel" style="padding:9px 16px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer; font-size:13px;">閉じる</button>
-        <button id="ghSettingsSave" style="padding:9px 16px; border-radius:8px; border:none; background:var(--orange); color:#fff; cursor:pointer; font-size:13px; font-weight:700;">保存</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function () {
-      const modal = document.getElementById("ghSettingsModal");
-      const btn = document.getElementById("ghSettingsBtn");
-      const tokenInput = document.getElementById("ghTokenInput");
-      const repoInput = document.getElementById("ghRepoInput");
-      const branchInput = document.getElementById("ghBranchInput");
-      const statusEl = document.getElementById("ghSettingsStatus");
-
-      function openModal() {
-        const s = ghLoadSettings();
-        tokenInput.value = ghLoadToken();
-        repoInput.value = `${s.owner}/${s.repo}`;
-        branchInput.value = s.branch;
-        statusEl.textContent = "";
-        modal.style.display = "flex";
-      }
-      btn.addEventListener("click", openModal);
-      document.getElementById("ghSettingsCancel").addEventListener("click", () => { modal.style.display = "none"; });
-      document.getElementById("ghSettingsSave").addEventListener("click", () => {
-        const [owner, repo] = (repoInput.value || "").split("/").map((s) => s.trim());
-        if (!owner || !repo) {
-          statusEl.textContent = "リポジトリは owner/repo の形式で入力してください";
-          return;
-        }
-        ghSaveSettings({ owner, repo, branch: branchInput.value.trim() || "main" }, tokenInput.value.trim());
-        statusEl.textContent = "保存しました。ページを再読み込みします…";
-        setTimeout(() => location.reload(), 800);
-      });
-    })();
-  </script>
 
   <div class="share-banner">⚠️ このボードのデータはリンクを知っている人なら誰でも閲覧・編集できます。1人が編集している間、他の人は編集できないようにロックされます。</div>
   <div class="whoami">あなたの表示名: <b id="whoamiName">未設定</b><button id="changeNameBtn">変更する</button></div>
@@ -336,13 +280,19 @@
     <button class="ghost" id="pasteVisitBtn">📋 来場データを貼り付けて登録</button>
     <button class="ghost" id="refreshBtn">最新の状態に更新</button>
     <button class="ghost" id="resetBtn">絞り込みをリセット</button>
-    <button class="ghost" id="exportBackupBtn" style="border-color:#2f5f9e;color:#2f5f9e;">💾 データを書き出す</button>
-    <button class="ghost" id="importBackupBtn" style="border-color:#2f5f9e;color:#2f5f9e;">📂 データを読み込む</button>
-    <input type="file" id="importBackupFile" accept="application/json" style="display:none;">
     <span class="count" id="totalCount"></span>
   </div>
 
   <div id="boardArea"><div class="loading-msg">読み込み中...</div></div>
+
+  <details class="side-note" id="backupDetails" style="margin-top:18px;">
+    <summary style="font-size:12px;color:var(--ink-soft);">その他の操作（データのバックアップ）</summary>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="ghost" id="exportBackupBtn" style="font-size:12px;">💾 データを書き出す</button>
+      <button class="ghost" id="importBackupBtn" style="font-size:12px;">📂 データを読み込む</button>
+      <input type="file" id="importBackupFile" accept="application/json" style="display:none;">
+    </div>
+  </details>
 
   <footer class="note">初期データ: STEP タブ（ランディ集計）｜以降の追加・変更はこのボード上に保存されます</footer>
 </div>
@@ -476,111 +426,111 @@
 
 <script>
 /* ============================================================
-   GitHub連携設定（GitHub Pagesなどクラウド上でホストする場合に使用）
+   GitHub 連携設定（GitHub Pages でホストし、データもGitHubに保存する場合に使用）
    ------------------------------------------------------------
-   Claude.aiのアーティファクトとして開く場合（window.storageが最初から
-   使える場合）は、この仕組みは何もせず、元のwindow.storageのままにする。
-
-   GitHub Pagesなど外部でホストする場合は、GitHubの1つのリポジトリ内の
-   JSONファイルをデータベースの代わりに使う。各スタッフは初回のみ、右上の
-   「GitHub連携設定」から自分のPersonal Access Tokenを入力する（トークンは
-   その端末のbrowserにのみ保存され、他の人には共有されない）。
+   1. データ保存用の情報を下の3つに入力してください。
+      - GITHUB_OWNER: GitHubのユーザー名（例: "kitazume3432"）
+      - GITHUB_REPO:  リポジトリ名（例: "randy-step-tracker"）
+      - GITHUB_TOKEN: このリポジトリの Contents（読み書き）権限だけを持つ
+                       Personal Access Token（Fine-grained推奨）
+   2. データは、このリポジトリ内の "data/store.json" というファイルに
+      自動的に保存されます（最初は存在しなくても自動で作られます）。
+   3. 上記を空欄のままにした場合は、自動的に元のwindow.storage
+      （Claude側の共有保存）にフォールバックします。
+   ------------------------------------------------------------
+   ⚠️ 注意: このトークンはページのソースに含まれるため、リンクを知っている人には
+   見える状態になります。必ず「このリポジトリだけ」「Contentsの読み書きのみ」に
+   絞ったFine-grained personal access tokenを発行してください。
    ============================================================ */
-const GH_OWNER_DEFAULT = "kitazume3432";
-const GH_REPO_DEFAULT = "randy-step-tracker-data";
-const GH_BRANCH_DEFAULT = "main";
-const GH_SETTINGS_LS_KEY = "randyGhSettings";
-const GH_TOKEN_LS_KEY = "randyGhToken";
+const GITHUB_OWNER = ""; // 例: "kitazume3432"
+const GITHUB_REPO = "";  // 例: "randy-step-tracker"
+const GITHUB_TOKEN = ""; // このリポジトリ専用のPersonal Access Token
+const GITHUB_BRANCH = "main";
+const GITHUB_DATA_PATH = "data/store.json";
 
-function utf8ToBase64(str) {
-  const bytes = new TextEncoder().encode(str);
-  let binary = "";
-  bytes.forEach((b) => { binary += String.fromCharCode(b); });
-  return btoa(binary);
-}
-function base64ToUtf8(b64) {
-  const binary = atob(b64.replace(/\n/g, ""));
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
-}
-
-function ghLoadSettings() {
-  let s = {};
-  try { s = JSON.parse(localStorage.getItem(GH_SETTINGS_LS_KEY)) || {}; } catch (e) { s = {}; }
-  return {
-    owner: s.owner || GH_OWNER_DEFAULT,
-    repo: s.repo || GH_REPO_DEFAULT,
-    branch: s.branch || GH_BRANCH_DEFAULT,
-  };
-}
-function ghSaveSettings(settings, token) {
-  localStorage.setItem(GH_SETTINGS_LS_KEY, JSON.stringify(settings));
-  if (token !== undefined) localStorage.setItem(GH_TOKEN_LS_KEY, token);
-}
-function ghLoadToken() {
-  return localStorage.getItem(GH_TOKEN_LS_KEY) || "";
-}
-
-if (typeof window.storage === "undefined") {
-  const ghApiUrl = (key) => {
-    const { owner, repo } = ghLoadSettings();
-    return `https://api.github.com/repos/${owner}/${repo}/contents/data/${encodeURIComponent(key)}.json`;
-  };
-  const ghHeaders = () => ({
-    "Authorization": `Bearer ${ghLoadToken()}`,
+if (GITHUB_OWNER && GITHUB_REPO && GITHUB_TOKEN) {
+  const GH_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
+  const GH_HEADERS = {
+    "Authorization": `token ${GITHUB_TOKEN}`,
     "Accept": "application/vnd.github+json",
-  });
+  };
 
-  async function ghGetFileRaw(key) {
-    const { branch } = ghLoadSettings();
-    const res = await fetch(`${ghApiUrl(key)}?ref=${encodeURIComponent(branch)}`, { headers: ghHeaders() });
-    if (res.status === 404) return null;
-    if (!res.ok) throw new Error("GitHub get failed: " + res.status);
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function base64ToUtf8(b64) {
+    return decodeURIComponent(escape(atob(b64.replace(/\n/g, ""))));
+  }
+
+  async function ghReadStore() {
+    const res = await fetch(`${GH_API}?ref=${GITHUB_BRANCH}&t=${Date.now()}`, { headers: GH_HEADERS });
+    if (res.status === 404) {
+      return { data: {}, sha: null };
+    }
+    if (!res.ok) throw new Error("GitHub read failed: " + res.status);
     const json = await res.json();
-    return { text: base64ToUtf8(json.content), sha: json.sha };
+    let data = {};
+    try { data = JSON.parse(base64ToUtf8(json.content)); } catch (e) { data = {}; }
+    return { data, sha: json.sha };
+  }
+
+  async function ghWriteStore(data, sha, message) {
+    const body = {
+      message: message || "update data",
+      content: utf8ToBase64(JSON.stringify(data, null, 2)),
+      branch: GITHUB_BRANCH,
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(GH_API, {
+      method: "PUT",
+      headers: { ...GH_HEADERS, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 409 || res.status === 422) {
+      const err = new Error("conflict");
+      err.conflict = true;
+      throw err;
+    }
+    if (!res.ok) throw new Error("GitHub write failed: " + res.status);
+    return res.json();
+  }
+
+  async function ghMutate(mutateFn, message) {
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const { data, sha } = await ghReadStore();
+      mutateFn(data);
+      try {
+        await ghWriteStore(data, sha, message);
+        return;
+      } catch (e) {
+        if (e && e.conflict) {
+          await new Promise(r => setTimeout(r, 250 + Math.random() * 400));
+          continue;
+        }
+        throw e;
+      }
+    }
+    throw new Error("GitHub write conflict: retries exhausted");
   }
 
   window.storage = {
     async get(key /*, shared */) {
-      if (!ghLoadToken()) throw new Error("GitHubトークンが設定されていません。右上の「GitHub連携設定」から設定してください。");
-      const file = await ghGetFileRaw(key);
-      if (!file) throw new Error("key not found");
-      return { key, value: JSON.parse(file.text), shared: true };
+      const { data } = await ghReadStore();
+      if (!(key in data)) throw new Error("key not found");
+      return { key, value: data[key], shared: true };
     },
     async set(key, value /*, shared */) {
-      if (!ghLoadToken()) throw new Error("GitHubトークンが設定されていません。右上の「GitHub連携設定」から設定してください。");
-      const { branch } = ghLoadSettings();
-      const existing = await ghGetFileRaw(key).catch(() => null);
-      const body = {
-        message: `update ${key} (${new Date().toISOString()})`,
-        content: utf8ToBase64(JSON.stringify(value)),
-        branch,
-      };
-      if (existing && existing.sha) body.sha = existing.sha;
-      const res = await fetch(ghApiUrl(key), {
-        method: "PUT",
-        headers: { ...ghHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error("GitHub set failed: " + res.status);
+      await ghMutate((data) => { data[key] = value; }, `set ${key}`);
       return { key, value, shared: true };
     },
     async delete(key /*, shared */) {
-      if (!ghLoadToken()) throw new Error("GitHubトークンが設定されていません。右上の「GitHub連携設定」から設定してください。");
-      const { branch } = ghLoadSettings();
-      const existing = await ghGetFileRaw(key).catch(() => null);
-      if (!existing) return { key, deleted: true, shared: true };
-      const res = await fetch(ghApiUrl(key), {
-        method: "DELETE",
-        headers: { ...ghHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify({ message: `delete ${key}`, sha: existing.sha, branch }),
-      });
-      if (!res.ok) throw new Error("GitHub delete failed: " + res.status);
+      await ghMutate((data) => { delete data[key]; }, `delete ${key}`);
       return { key, deleted: true, shared: true };
     },
     async list(prefix) {
-      return { keys: [], prefix, shared: true }; // このアプリでは未使用
+      const { data } = await ghReadStore();
+      const keys = Object.keys(data).filter(k => !prefix || k.startsWith(prefix));
+      return { keys, prefix, shared: true };
     },
   };
 }
@@ -638,7 +588,7 @@ async function saveStaffList() {
     const result = await window.storage.set(STAFF_KEY, JSON.stringify(staffList), true);
     if (!result) toast("メンバーリストの保存に失敗しました。", true);
   } catch (e) {
-    toast("メンバーリストを保存できませんでした。", true);
+    toast("メンバーリストを保存できませんでした：" + (e && e.message ? e.message : "原因不明のエラー"), true);
   }
 }
 
@@ -1006,9 +956,14 @@ async function loadCustomers() {
 async function saveCustomers() {
   try {
     const result = await window.storage.set(STORAGE_KEY, JSON.stringify(customers), true);
-    if (!result) toast("保存に失敗しました。もう一度お試しください。", true);
+    if (!result) {
+      toast("保存に失敗しました。もう一度お試しください。", true);
+      return false;
+    }
+    return true;
   } catch (e) {
-    toast("保存できませんでした（この画面は共有ストレージに接続できていない可能性があります）。", true);
+    toast("保存できませんでした：" + (e && e.message ? e.message : "原因不明のエラー"), true);
+    return false;
   }
 }
 
@@ -1453,13 +1408,15 @@ async function handleSave() {
   } else {
     customers.push(record);
   }
-  await saveCustomers();
+  const ok = await saveCustomers();
   await closeModal();
   render();
-  toast("保存しました。");
-  // ==== STEP5到達サプライズの発火（不要ならこの3行を削除でOK） ====
-  if (record.progress === "ST5" && prevProgress !== "ST5") {
-    celebrateStep5(record.name);
+  if (ok) {
+    toast("保存しました。");
+    // ==== STEP5到達サプライズの発火（不要ならこの3行を削除でOK） ====
+    if (record.progress === "ST5" && prevProgress !== "ST5") {
+      celebrateStep5(record.name);
+    }
   }
 }
 
@@ -1468,9 +1425,9 @@ async function toggleSurveySent(id, tierKey, checked) {
   if (!c) return;
   if (!c.surveySent) c.surveySent = { t1:false, t2:false, t3:false };
   c.surveySent[tierKey] = checked;
-  await saveCustomers();
+  const ok = await saveCustomers();
   render();
-  toast(checked ? "送信済みにしました。" : "未送信に戻しました。");
+  if (ok) toast(checked ? "送信済みにしました。" : "未送信に戻しました。");
 }
 
 async function toggleRenewalSent(id, checked) {
@@ -1478,9 +1435,9 @@ async function toggleRenewalSent(id, checked) {
   if (!c) return;
   c.renewalReminderSent = checked;
   c.renewalReminderSentFor = checked ? (c.renewalDate || "") : "";
-  await saveCustomers();
+  const ok = await saveCustomers();
   render();
-  toast(checked ? "更新メール送信済みにしました。" : "未送信に戻しました。");
+  if (ok) toast(checked ? "更新メール送信済みにしました。" : "未送信に戻しました。");
 }
 
 async function handleDelete() {
@@ -1489,10 +1446,10 @@ async function handleDelete() {
   const ok = await askConfirm("削除の確認", "このお客様を削除します。よろしいですか？");
   if (!ok) return;
   customers = customers.filter(c => c.id !== id);
-  await saveCustomers();
+  const saved = await saveCustomers();
   await closeModal();
   render();
-  toast("削除しました。");
+  if (saved) toast("削除しました。");
 }
 
 /* ==== データのバックアップ書き出し・読み込み（公開し直してもデータを守るための保険） ==== */
@@ -1544,9 +1501,9 @@ async function importBackupFromFile(file) {
     staffList = data.staffList;
     await saveStaffList();
   }
-  await saveCustomers();
+  const saveOk = await saveCustomers();
   render();
-  toast("バックアップからデータを復元しました。");
+  if (saveOk) toast("バックアップからデータを復元しました。");
 }
 
 document.getElementById("exportBackupBtn").addEventListener("click", exportBackup);
