@@ -426,109 +426,50 @@
 
 <script>
 /* ============================================================
-   GitHub 連携設定（GitHub Pages でホストし、データもGitHubに保存する場合に使用）
+   Cloudflare Worker 経由でのデータ保存設定
    ------------------------------------------------------------
-   1. データ保存用の情報を下の3つに入力してください。
-      - GITHUB_OWNER: GitHubのユーザー名（例: "kitazume3432"）
-      - GITHUB_REPO:  リポジトリ名（例: "randy-step-tracker"）
-      - GITHUB_TOKEN: このリポジトリの Contents（読み書き）権限だけを持つ
-                       Personal Access Token（Fine-grained推奨）
-   2. データは、このリポジトリ内の "data/store.json" というファイルに
-      自動的に保存されます（最初は存在しなくても自動で作られます）。
-   3. 上記を空欄のままにした場合は、自動的に元のwindow.storage
-      （Claude側の共有保存）にフォールバックします。
-   ------------------------------------------------------------
-   ⚠️ 注意: このトークンはページのソースに含まれるため、リンクを知っている人には
-   見える状態になります。必ず「このリポジトリだけ」「Contentsの読み書きのみ」に
-   絞ったFine-grained personal access tokenを発行してください。
+   GitHubのトークンをこのファイルに直接書かず、Cloudflare Workers側の
+   「Secret」に隠して、Workerを中継役として使う方式です。
+   下のWORKER_URLに、デプロイしたWorkerのURLを貼り付けてください。
+   （例: "https://randy-proxy.your-subdomain.workers.dev"）
+   空欄のままにした場合は、自動的に元のwindow.storage
+   （Claude側の共有保存）にフォールバックします。
    ============================================================ */
-const GITHUB_OWNER = ""; // 例: "kitazume3432"
-const GITHUB_REPO = "";  // 例: "randy-step-tracker"
-const GITHUB_TOKEN = ""; // このリポジトリ専用のPersonal Access Token
-const GITHUB_BRANCH = "main";
-const GITHUB_DATA_PATH = "data/store.json";
+const WORKER_URL = ""; // ここにCloudflare WorkerのURLを貼り付けてください
 
-if (GITHUB_OWNER && GITHUB_REPO && GITHUB_TOKEN) {
-  const GH_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
-  const GH_HEADERS = {
-    "Authorization": `token ${GITHUB_TOKEN}`,
-    "Accept": "application/vnd.github+json",
-  };
-
-  function utf8ToBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-  function base64ToUtf8(b64) {
-    return decodeURIComponent(escape(atob(b64.replace(/\n/g, ""))));
-  }
-
-  async function ghReadStore() {
-    const res = await fetch(`${GH_API}?ref=${GITHUB_BRANCH}&t=${Date.now()}`, { headers: GH_HEADERS });
-    if (res.status === 404) {
-      return { data: {}, sha: null };
-    }
-    if (!res.ok) throw new Error("GitHub read failed: " + res.status);
-    const json = await res.json();
-    let data = {};
-    try { data = JSON.parse(base64ToUtf8(json.content)); } catch (e) { data = {}; }
-    return { data, sha: json.sha };
-  }
-
-  async function ghWriteStore(data, sha, message) {
-    const body = {
-      message: message || "update data",
-      content: utf8ToBase64(JSON.stringify(data, null, 2)),
-      branch: GITHUB_BRANCH,
-    };
-    if (sha) body.sha = sha;
-    const res = await fetch(GH_API, {
-      method: "PUT",
-      headers: { ...GH_HEADERS, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (res.status === 409 || res.status === 422) {
-      const err = new Error("conflict");
-      err.conflict = true;
-      throw err;
-    }
-    if (!res.ok) throw new Error("GitHub write failed: " + res.status);
-    return res.json();
-  }
-
-  async function ghMutate(mutateFn, message) {
-    for (let attempt = 0; attempt < 6; attempt++) {
-      const { data, sha } = await ghReadStore();
-      mutateFn(data);
-      try {
-        await ghWriteStore(data, sha, message);
-        return;
-      } catch (e) {
-        if (e && e.conflict) {
-          await new Promise(r => setTimeout(r, 250 + Math.random() * 400));
-          continue;
-        }
-        throw e;
-      }
-    }
-    throw new Error("GitHub write conflict: retries exhausted");
-  }
+if (WORKER_URL) {
+  const base = WORKER_URL.replace(/\/$/, "");
 
   window.storage = {
     async get(key /*, shared */) {
-      const { data } = await ghReadStore();
+      const res = await fetch(`${base}/store?t=${Date.now()}`);
+      if (!res.ok) throw new Error("Worker get failed: " + res.status);
+      const data = await res.json();
       if (!(key in data)) throw new Error("key not found");
       return { key, value: data[key], shared: true };
     },
     async set(key, value /*, shared */) {
-      await ghMutate((data) => { data[key] = value; }, `set ${key}`);
+      const res = await fetch(`${base}/set`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+      });
+      if (!res.ok) throw new Error("Worker set failed: " + res.status);
       return { key, value, shared: true };
     },
     async delete(key /*, shared */) {
-      await ghMutate((data) => { delete data[key]; }, `delete ${key}`);
+      const res = await fetch(`${base}/delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+      if (!res.ok) throw new Error("Worker delete failed: " + res.status);
       return { key, deleted: true, shared: true };
     },
     async list(prefix) {
-      const { data } = await ghReadStore();
+      const res = await fetch(`${base}/store?t=${Date.now()}`);
+      if (!res.ok) throw new Error("Worker list failed: " + res.status);
+      const data = await res.json();
       const keys = Object.keys(data).filter(k => !prefix || k.startsWith(prefix));
       return { keys, prefix, shared: true };
     },
