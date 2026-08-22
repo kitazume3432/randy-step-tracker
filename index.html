@@ -435,7 +435,7 @@
    空欄のままにした場合は、自動的に元のwindow.storage
    （Claude側の共有保存）にフォールバックします。
    ============================================================ */
-const WORKER_URL = ""; // ここにCloudflare WorkerのURLを貼り付けてください
+ const WORKER_URL = "https://randy-proxy.shimada-c1e.workers.dev";// ここにCloudflare WorkerのURLを貼り付けてください
 
 if (WORKER_URL) {
   const base = WORKER_URL.replace(/\/$/, "");
