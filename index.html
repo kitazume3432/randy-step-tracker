@@ -435,15 +435,23 @@
    空欄のままにした場合は、自動的に元のwindow.storage
    （Claude側の共有保存）にフォールバックします。
    ============================================================ */
- const WORKER_URL = "https://randy-proxy.shimada-c1e.workers.dev";// ここにCloudflare WorkerのURLを貼り付けてください
+const WORKER_URL = "https://randy-proxy.shimada-c1e.workers.dev"; // ここにCloudflare WorkerのURLを貼り付けてください
 
 if (WORKER_URL) {
   const base = WORKER_URL.replace(/\/$/, "");
 
+  async function workerErrorDetail(res) {
+    try {
+      const body = await res.json();
+      if (body && body.error) return body.error;
+    } catch (e) { /* ignore */ }
+    return "status " + res.status;
+  }
+
   window.storage = {
     async get(key /*, shared */) {
       const res = await fetch(`${base}/store?t=${Date.now()}`);
-      if (!res.ok) throw new Error("Worker get failed: " + res.status);
+      if (!res.ok) throw new Error("Worker get failed: " + (await workerErrorDetail(res)));
       const data = await res.json();
       if (!(key in data)) throw new Error("key not found");
       return { key, value: data[key], shared: true };
@@ -454,7 +462,7 @@ if (WORKER_URL) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value }),
       });
-      if (!res.ok) throw new Error("Worker set failed: " + res.status);
+      if (!res.ok) throw new Error("Worker set failed: " + (await workerErrorDetail(res)));
       return { key, value, shared: true };
     },
     async delete(key /*, shared */) {
@@ -463,12 +471,12 @@ if (WORKER_URL) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key }),
       });
-      if (!res.ok) throw new Error("Worker delete failed: " + res.status);
+      if (!res.ok) throw new Error("Worker delete failed: " + (await workerErrorDetail(res)));
       return { key, deleted: true, shared: true };
     },
     async list(prefix) {
       const res = await fetch(`${base}/store?t=${Date.now()}`);
-      if (!res.ok) throw new Error("Worker list failed: " + res.status);
+      if (!res.ok) throw new Error("Worker list failed: " + (await workerErrorDetail(res)));
       const data = await res.json();
       const keys = Object.keys(data).filter(k => !prefix || k.startsWith(prefix));
       return { keys, prefix, shared: true };
