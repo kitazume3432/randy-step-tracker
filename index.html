@@ -334,10 +334,10 @@
     </div>
     <label>最終活動日（ランディでの動き）</label>
     <input type="date" id="fLastActivity">
-    <label>更新日（3ヶ月ごと・非公開物件の閲覧更新）</label>
+    <label>閲覧期限（3ヶ月ごと・非公開物件の閲覧期限）</label>
     <input type="date" id="fRenewalDate">
     <div class="survey-checks">
-      <label class="chk"><input type="checkbox" id="fRenewalSent"> 📧 更新メール送信済み（今回分）</label>
+      <label class="chk"><input type="checkbox" id="fRenewalSent"> 📧 案内メール送信済み（今回分）</label>
     </div>
     <label>ランディ 顧客詳細URL</label>
     <input type="text" id="fRandyUrl" placeholder="https://...">
@@ -970,9 +970,9 @@ function renewalBadge(c) {
   const days = daysSince(c.renewalDate);
   if (days === null) return "";
   if (days <= RENEWAL_PERIOD_DAYS) {
-    return `<span class="tag renew-ok">🔓 更新済み（非公開物件 閲覧可）</span>`;
+    return `<span class="tag renew-ok">🔓 閲覧期限内（非公開物件 閲覧可）</span>`;
   }
-  return `<span class="tag renew-bad">🔒 要更新（${days}日経過）</span>`;
+  return `<span class="tag renew-bad">🔒 閲覧期限切れ（${days}日経過）</span>`;
 }
 
 function renewalReminderResolved(c) {
@@ -1016,8 +1016,8 @@ function makeCard(c) {
   </div>` : "";
 
   const renewalCheckHtml = (!churned && renewalActive) ? `<div class="card-renewal">
-    <label title="更新のご案内メールを送信済みにする">
-      <input type="checkbox" class="renewal-check" data-id="${c.id}" ${renewalResolved ? "checked" : ""}>📧 更新メール送信済み
+    <label title="案内メールを送信済みにする">
+      <input type="checkbox" class="renewal-check" data-id="${c.id}" ${renewalResolved ? "checked" : ""}>📧 案内メール送信済み
     </label>
   </div>` : "";
 
@@ -1373,7 +1373,7 @@ async function toggleRenewalSent(id, checked) {
   c.renewalReminderSentFor = checked ? (c.renewalDate || "") : "";
   const ok = await saveCustomers();
   render();
-  if (ok) toast(checked ? "更新メール送信済みにしました。" : "未送信に戻しました。");
+  if (ok) toast(checked ? "案内メール送信済みにしました。" : "未送信に戻しました。");
 }
 
 async function handleDelete() {
