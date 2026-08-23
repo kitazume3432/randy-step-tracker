@@ -336,14 +336,6 @@
     <input type="date" id="fLastActivity">
     <label>更新日（3ヶ月ごと・非公開物件の閲覧更新）</label>
     <input type="date" id="fRenewalDate">
-    <div class="row2">
-      <div>
-        <button type="button" class="btn-plain small-btn" id="fromRegDateBtn" style="width:100%">登録日 +3ヶ月にする</button>
-      </div>
-      <div>
-        <button type="button" class="btn-plain small-btn" id="extendRenewalBtn" style="width:100%">更新日 +3ヶ月延長する</button>
-      </div>
-    </div>
     <div class="survey-checks">
       <label class="chk"><input type="checkbox" id="fRenewalSent"> 📧 更新メール送信済み（今回分）</label>
     </div>
@@ -775,22 +767,6 @@ function addMonthsToDateStr(dateStr, months) {
 }
 
 document.getElementById("fRenewalDate").addEventListener("input", () => {
-  document.getElementById("fRenewalSent").checked = false;
-});
-
-document.getElementById("fromRegDateBtn").addEventListener("click", () => {
-  const regDateStr = document.getElementById("fMonth").value.trim();
-  const result = addMonthsToDateStr(regDateStr, 3);
-  if (!result) { toast("先に「登録日」を入力してください。", true); return; }
-  document.getElementById("fRenewalDate").value = result;
-  document.getElementById("fRenewalSent").checked = false;
-});
-
-document.getElementById("extendRenewalBtn").addEventListener("click", () => {
-  const currentRenewal = document.getElementById("fRenewalDate").value.trim();
-  const result = addMonthsToDateStr(currentRenewal, 3);
-  if (!result) { toast("先に「更新日」を入力してください。", true); return; }
-  document.getElementById("fRenewalDate").value = result;
   document.getElementById("fRenewalSent").checked = false;
 });
 
