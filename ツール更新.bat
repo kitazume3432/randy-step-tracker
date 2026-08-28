@@ -1,5 +1,4 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 pushd "%~dp0"
 if errorlevel 1 (
