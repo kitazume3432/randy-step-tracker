@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal enabledelayedexpansion
 pushd "%~dp0"
 if errorlevel 1 (
@@ -23,24 +24,16 @@ echo.
 set "DOWNLOADS=%USERPROFILE%\Downloads"
 set "NEWEST="
 
-rem --- Safety filter: only consider files whose name contains "randy" or "ランディ" ---
+rem --- Safety filter: only consider files whose name contains "randy" (any case) or "ランディ" ---
 rem     (so an unrelated .html download from other work doesn't get picked up by mistake)
 for /f "delims=" %%F in ('dir /b /o-d /a-d "%DOWNLOADS%\*.html" 2^>nul') do (
-  set "FNAME=%%F"
-  set "FNAME_LOWER=!FNAME!"
-  for %%C in (
-    "A=a" "B=b" "C=c" "D=d" "E=e" "F=f" "G=g" "H=h" "I=i" "J=j" "K=k" "L=l" "M=m"
-    "N=n" "O=o" "P=p" "Q=q" "R=r" "S=s" "T=t" "U=u" "V=v" "W=w" "X=x" "Y=y" "Z=z"
-  ) do (
-    for /f "tokens=1,2 delims==" %%a in (%%C) do set "FNAME_LOWER=!FNAME_LOWER:%%a=%%b!"
-  )
-  set "MATCH="
-  echo !FNAME_LOWER! | findstr /c:"randy" >nul
-  if !errorlevel! equ 0 set "MATCH=1"
-  echo !FNAME! | findstr /c:"ランディ" >nul
-  if !errorlevel! equ 0 set "MATCH=1"
-  if defined MATCH (
-    if not defined NEWEST set "NEWEST=!FNAME!"
+  if not defined NEWEST (
+    set "MATCH="
+    echo %%F | findstr /i /c:"randy" >nul
+    if !errorlevel! equ 0 set "MATCH=1"
+    echo %%F | findstr /c:"ランディ" >nul
+    if !errorlevel! equ 0 set "MATCH=1"
+    if defined MATCH set "NEWEST=%%F"
   )
 )
 
