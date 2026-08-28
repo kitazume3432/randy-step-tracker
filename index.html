@@ -334,7 +334,7 @@
     </div>
     <label>最終活動日（ランディでの動き）</label>
     <input type="date" id="fLastActivity">
-    <label>閲覧期限（3ヶ月ごと・非公開物件の閲覧期限）</label>
+    <label>閲覧期限（非公開物件を閲覧できる期限日そのもの）</label>
     <input type="date" id="fRenewalDate">
     <div class="survey-checks">
       <label class="chk"><input type="checkbox" id="fRenewalSent"> 📧 案内メール送信済み（今回分）</label>
@@ -963,16 +963,25 @@ function stallBadge(info) {
   return `<span class="tag stall-ok">${info.days}日前に活動</span>`;
 }
 
-const RENEWAL_PERIOD_DAYS = 90; // 3ヶ月ごとの更新
-const RENEWAL_REMINDER_LEAD_DAYS = 14; // 更新の2週間前から知らせる
+const RENEWAL_REMINDER_LEAD_DAYS = 14; // 期限の2週間前から知らせる
+
+// 「閲覧期限」欄は期限日そのもの。今日から見て何日後(マイナスなら何日過ぎているか)を返す
+function daysUntil(str) {
+  const d = parseFlexibleDate(str);
+  if (!d) return null;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  d.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
 
 function renewalBadge(c) {
-  const days = daysSince(c.renewalDate);
-  if (days === null) return "";
-  if (days <= RENEWAL_PERIOD_DAYS) {
-    return `<span class="tag renew-ok">🔓 閲覧期限内（非公開物件 閲覧可）</span>`;
+  const daysLeft = daysUntil(c.renewalDate);
+  if (daysLeft === null) return "";
+  if (daysLeft >= 0) {
+    return `<span class="tag renew-ok">🔓 閲覧期限内（非公開物件 閲覧可・残り${daysLeft}日）</span>`;
   }
-  return `<span class="tag renew-bad">🔒 閲覧期限切れ（${days}日経過）</span>`;
+  return `<span class="tag renew-bad">🔒 閲覧期限切れ（${Math.abs(daysLeft)}日経過）</span>`;
 }
 
 function renewalReminderResolved(c) {
@@ -989,9 +998,9 @@ function makeCard(c) {
   const currentTierKey = tierKeyMap[info.tier];
   const stallResolved = !currentTierKey || !!sv[currentTierKey];
 
-  const renewalDays = daysSince(c.renewalDate);
-  const renewalActive = renewalDays !== null && renewalDays >= (RENEWAL_PERIOD_DAYS - RENEWAL_REMINDER_LEAD_DAYS);
-  const renewalOverdue = renewalDays !== null && renewalDays >= RENEWAL_PERIOD_DAYS;
+  const renewalDaysLeft = daysUntil(c.renewalDate);
+  const renewalActive = renewalDaysLeft !== null && renewalDaysLeft <= RENEWAL_REMINDER_LEAD_DAYS;
+  const renewalOverdue = renewalDaysLeft !== null && renewalDaysLeft < 0;
   const renewalResolved = renewalReminderResolved(c);
 
   // 色の優先度: 更新リマインドが未対応なら最優先、それ以外はアンケート停滞の色

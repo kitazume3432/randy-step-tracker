@@ -23,14 +23,14 @@ echo.
 set "DOWNLOADS=%USERPROFILE%\Downloads"
 set "NEWEST="
 
-rem --- Safety filter: only consider files whose name contains "randy" (any case) or "ãƒ©ãƒ³ãƒ‡ã‚£" ---
+rem --- Safety filter: only consider files whose name contains "randy" (any case) or "ƒ‰ƒ“ƒfƒB" ---
 rem     (so an unrelated .html download from other work doesn't get picked up by mistake)
 for /f "delims=" %%F in ('dir /b /o-d /a-d "%DOWNLOADS%\*.html" 2^>nul') do (
   if not defined NEWEST (
     set "MATCH="
     echo %%F | findstr /i /c:"randy" >nul
     if !errorlevel! equ 0 set "MATCH=1"
-    echo %%F | findstr /c:"ãƒ©ãƒ³ãƒ‡ã‚£" >nul
+    echo %%F | findstr /c:"ƒ‰ƒ“ƒfƒB" >nul
     if !errorlevel! equ 0 set "MATCH=1"
     if defined MATCH set "NEWEST=%%F"
   )
@@ -40,7 +40,7 @@ if not defined NEWEST goto :nofile
 goto :foundfile
 
 :nofile
-echo No matching .html file (containing "randy" or "ãƒ©ãƒ³ãƒ‡ã‚£") was found in: %DOWNLOADS%
+echo No matching .html file (containing "randy" or "ƒ‰ƒ“ƒfƒB") was found in: %DOWNLOADS%
 echo Skipping the overwrite step. Continuing with the files already in this folder.
 echo No matching html file found in Downloads. Skipped overwrite. >> "%LOGFILE%"
 echo.
