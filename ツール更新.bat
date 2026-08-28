@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 pushd "%~dp0"
 if errorlevel 1 (
   echo Failed to move to folder: %~dp0
@@ -23,22 +23,39 @@ echo.
 set "DOWNLOADS=%USERPROFILE%\Downloads"
 set "NEWEST="
 
+rem --- Safety filter: only consider files whose name contains "randy" or "ランディ" ---
+rem     (so an unrelated .html download from other work doesn't get picked up by mistake)
 for /f "delims=" %%F in ('dir /b /o-d /a-d "%DOWNLOADS%\*.html" 2^>nul') do (
-  if not defined NEWEST set "NEWEST=%%F"
+  set "FNAME=%%F"
+  set "FNAME_LOWER=!FNAME!"
+  for %%C in (
+    "A=a" "B=b" "C=c" "D=d" "E=e" "F=f" "G=g" "H=h" "I=i" "J=j" "K=k" "L=l" "M=m"
+    "N=n" "O=o" "P=p" "Q=q" "R=r" "S=s" "T=t" "U=u" "V=v" "W=w" "X=x" "Y=y" "Z=z"
+  ) do (
+    for /f "tokens=1,2 delims==" %%a in (%%C) do set "FNAME_LOWER=!FNAME_LOWER:%%a=%%b!"
+  )
+  set "MATCH="
+  echo !FNAME_LOWER! | findstr /c:"randy" >nul
+  if !errorlevel! equ 0 set "MATCH=1"
+  echo !FNAME! | findstr /c:"ランディ" >nul
+  if !errorlevel! equ 0 set "MATCH=1"
+  if defined MATCH (
+    if not defined NEWEST set "NEWEST=!FNAME!"
+  )
 )
 
 if not defined NEWEST goto :nofile
 goto :foundfile
 
 :nofile
-echo No .html file was found in: %DOWNLOADS%
+echo No matching .html file (containing "randy" or "ランディ") was found in: %DOWNLOADS%
 echo Skipping the overwrite step. Continuing with the files already in this folder.
-echo No html file found in Downloads. Skipped overwrite. >> "%LOGFILE%"
+echo No matching html file found in Downloads. Skipped overwrite. >> "%LOGFILE%"
 echo.
 goto :commitpush
 
 :foundfile
-echo Newest .html file found in Downloads folder:
+echo Newest matching .html file found in Downloads folder:
 echo   %NEWEST%
 for %%A in ("%DOWNLOADS%\%NEWEST%") do echo   Last modified: %%~tA
 echo.
@@ -104,6 +121,19 @@ exit /b 1
 
 :dopush
 echo.
+echo Syncing with GitHub first (pulling latest changes, e.g. data saved by the app)...
+echo. >> "%LOGFILE%"
+echo --- git pull --- >> "%LOGFILE%"
+set "PULLTEMP=%temp%\pull_output_%random%.txt"
+git pull --no-edit > "%PULLTEMP%" 2>&1
+set "PULLRESULT=%errorlevel%"
+type "%PULLTEMP%"
+type "%PULLTEMP%" >> "%LOGFILE%"
+del "%PULLTEMP%" >nul 2>&1
+
+if not "%PULLRESULT%"=="0" goto :pullfailed
+
+echo.
 echo Uploading to GitHub...
 echo. >> "%LOGFILE%"
 echo --- git push --- >> "%LOGFILE%"
@@ -116,6 +146,17 @@ del "%PUSHTEMP%" >nul 2>&1
 
 if "%PUSHRESULT%"=="0" goto :pushsuccess
 goto :pushfailed
+
+:pullfailed
+echo.
+echo [ERROR] Could not sync with GitHub before pushing (git pull failed).
+echo This can happen if there are conflicting changes. Please check the message above,
+echo or ask for help resolving it.
+echo PULL RESULT: FAILED >> "%LOGFILE%"
+echo.
+pause
+popd
+exit /b 1
 
 :pushfailed
 echo.

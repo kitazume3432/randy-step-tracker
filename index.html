@@ -15,7 +15,10 @@
     --orange-deep: #b53d1f;
     --orange-soft: #fdeee7;
     --orange-pale: #fff8f4;
+    --amber: #e08a2e;
+    --green-bg: #e8f3ea; --green-ink: #2c7a44;
     --gray-bg: #f0eeea; --gray-ink: #8a8178;
+    --blue-bg: #eaf1fb; --blue-ink: #2f5f9e;
   }
   * { box-sizing: border-box; }
   body {
@@ -25,216 +28,261 @@
     font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1760px; margin: 0 auto; padding: 26px 22px 60px; }
+  .wrap { max-width: 1720px; margin: 0 auto; padding: 26px 22px 60px; }
 
-  header.top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
-  header.top .title-block { display: flex; align-items: center; gap: 12px; }
+  /* ---------- Header ---------- */
+  header.top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  header.top .title-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
   .logo-chip {
-    width: 40px; height: 40px; border-radius: 10px;
+    width: 40px; height: 40px;
+    border-radius: 10px;
     background: linear-gradient(135deg, var(--orange), var(--orange-deep));
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 700; font-size: 15px; flex-shrink: 0;
+    color: #fff; font-weight: 700; font-size: 15px;
+    flex-shrink: 0;
     box-shadow: 0 3px 8px rgba(217,80,44,0.28);
   }
-  header.top h1 { font-size: 21px; margin: 0; color: var(--orange-deep); letter-spacing: 0.01em; }
-  header.top .sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
-  header.top .add-btn {
-    padding: 10px 18px; border-radius: 9px; border: none; background: var(--orange); color: #fff;
-    font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 8px rgba(217,80,44,0.25);
+  header.top h1 {
+    font-size: 21px;
+    margin: 0;
+    color: var(--orange-deep);
+    letter-spacing: 0.01em;
   }
-  header.top .add-btn:hover { background: var(--orange-deep); }
-
-  .share-banner {
-    display: flex; align-items: center; gap: 8px; background: #fff6ea; border: 1px solid #f0dcb8;
-    color: #8a6a2c; font-size: 12px; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px;
+  header.top .sub {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 2px;
   }
-  .whoami { font-size: 12px; color: var(--ink-soft); margin-bottom: 16px; }
-  .whoami button { border: none; background: none; color: var(--orange-deep); cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0; margin-left: 4px; }
 
-  .flow-bar { display: flex; gap: 3px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(60,30,10,0.08); }
+  /* ---------- Chevron flow bar ---------- */
+  .flow-bar {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(60,30,10,0.08);
+  }
   .flow-seg {
-    position: relative; flex: 1; color: #fff; padding: 10px 6px 10px 22px;
-    font-size: 12px; font-weight: 600; text-align: center;
+    position: relative;
+    flex: 1;
+    background: var(--orange);
+    color: #fff;
+    padding: 10px 6px 10px 22px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
+    cursor: pointer;
+    transition: filter 0.15s ease;
     min-width: 74px;
   }
   .flow-seg:first-child { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); padding-left: 14px; }
-  .flow-seg .n { display:block; font-size:20px; font-weight:800; margin-top:1px; }
-  .flow-seg .lbl { display:block; font-size: 10.5px; font-weight: 500; opacity: 0.92; white-space: nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .flow-seg .n { display:block; font-size:16px; font-weight:800; margin-top:1px; }
+  .flow-seg .lbl { display:block; font-size: 10.5px; font-weight: 500; opacity: 0.92; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .flow-seg:nth-child(1) { background: #c9c2ba; }
+  .flow-seg:nth-child(2) { background: #e8987a; }
+  .flow-seg:nth-child(3) { background: #e2825f; }
+  .flow-seg:nth-child(4) { background: #dc6c47; }
+  .flow-seg:nth-child(5) { background: #d65731; }
+  .flow-seg:nth-child(6) { background: var(--orange-deep); }
+  .flow-seg:hover { filter: brightness(1.08); }
+  .flow-seg.active { outline: 2px solid #3a2418; outline-offset: -2px; }
 
+  /* ---------- Toolbar ---------- */
   .toolbar {
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    padding: 11px 14px; margin-bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 16px;
   }
   .toolbar input[type="search"] {
-    flex: 1 1 200px; min-width: 160px; padding: 8px 12px;
-    border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: var(--orange-pale);
+    flex: 1 1 200px;
+    min-width: 160px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--orange-pale);
   }
-  .toolbar select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: var(--orange-pale); color: var(--ink); }
-  .toolbar label.chk { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
-  .toolbar .count { font-size: 12.5px; color: var(--ink-soft); margin-left: auto; white-space: nowrap; }
+  .toolbar select {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--orange-pale);
+    color: var(--ink);
+  }
+  .toolbar label.chk {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .toolbar .count {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-left: auto;
+    white-space: nowrap;
+  }
   .toolbar button.ghost {
-    padding: 7px 12px; border-radius: 8px; border: 1px solid var(--orange);
-    background: transparent; color: var(--orange-deep); font-size: 12.5px; cursor: pointer;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--orange);
+    background: transparent;
+    color: var(--orange-deep);
+    font-size: 12.5px;
+    cursor: pointer;
   }
   .toolbar button.ghost:hover { background: var(--orange-soft); }
 
-  .reg-stat {
-    display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px;
-    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
-    padding: 6px 14px; font-size: 12.5px; color: var(--ink-soft);
+  /* ---------- Board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(200px, 1fr));
+    gap: 12px;
+    align-items: start;
   }
-  .reg-stat b { color: var(--orange-deep); font-size: 14px; }
-  .reg-stat .bar {
-    width: 90px; height: 6px; background: var(--gray-bg); border-radius: 4px; overflow: hidden;
+  .column {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 160px;
+    max-height: 74vh;
   }
-  .reg-stat .bar-fill { height: 100%; }
-  .monthly-reg-table { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-  .monthly-reg-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
-  .monthly-reg-row .m-label { width: 64px; flex-shrink: 0; color: var(--ink); font-weight: 700; }
-  .monthly-reg-row .m-bar { flex: 1; height: 8px; background: var(--gray-bg); border-radius: 4px; overflow: hidden; }
-  .monthly-reg-row .m-bar-fill { height: 100%; }
-  .monthly-reg-row .m-pct { width: 40px; text-align: right; font-weight: 700; flex-shrink: 0; }
-  .monthly-reg-row .m-count { width: 90px; text-align: right; color: var(--ink-soft); flex-shrink: 0; }
-
-  .legend-staff {
-    display: inline-block; font-size: 12px; margin-top: 10px;
+  .column-head {
+    padding: 12px 12px 10px;
+    border-bottom: 2px solid var(--col-accent, var(--orange));
+    border-radius: 12px 12px 0 0;
+    background: var(--col-tint, var(--orange-pale));
   }
-  .staff-rate-row { display: flex; align-items: center; gap: 12px; padding: 3px 0; }
-  .staff-rate-row.staff-rate-head { color: var(--ink-soft); font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 5px; margin-bottom: 2px; }
-  .staff-rate-row .sr-name { width: 64px; flex-shrink: 0; font-weight: 800; display: flex; align-items: center; gap: 5px; }
-  .staff-rate-row .sr-col { width: 52px; text-align: right; font-weight: 700; flex-shrink: 0; }
-  .staff-rate-row .sr-col.na { color: var(--ink-soft); font-weight: 400; }
-  .staff-rate-row .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-
-  .board { display: grid; grid-template-columns: repeat(6, minmax(200px, 1fr)); gap: 12px; align-items: start; }
-  .column { background: var(--card); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; min-height: 160px; max-height: 74vh; }
-  .column-head { padding: 12px 12px 10px; border-bottom: 2px solid var(--col-accent, var(--orange)); border-radius: 12px 12px 0 0; background: var(--col-tint, var(--orange-pale)); }
-  .column-head .step-tag { font-size: 10.5px; font-weight: 700; color: var(--col-accent, var(--orange-deep)); letter-spacing: 0.04em; }
-  .column-head .step-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 1px; line-height: 1.3; }
-  .column-head .step-count { font-size: 15px; font-weight: 800; color: var(--ink); margin-top: 3px; }
-  .cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .column-head .step-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--col-accent, var(--orange-deep));
+    letter-spacing: 0.04em;
+  }
+  .column-head .step-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 1px;
+  }
+  .column-head .step-count {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+  .cards {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   .card {
-    border: 1px solid var(--line); border-left: 4px solid var(--staff-color, var(--orange));
-    border-radius: 9px; padding: 9px 10px 9px 9px; background: #fffdfb;
-    transition: box-shadow 0.15s ease, transform 0.1s ease; cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 9px 10px;
+    background: #fffdfb;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
   }
-  .card:hover { box-shadow: 0 3px 10px rgba(60,30,10,0.09); transform: translateY(-1px); }
+  .card:hover {
+    box-shadow: 0 3px 10px rgba(60,30,10,0.09);
+    transform: translateY(-1px);
+  }
   .card.churned { opacity: 0.55; background: #f5f2ef; }
-  .card-top { display: flex; align-items: center; gap: 7px; }
-  .avatar {
-    flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
-    color: #fff; font-size: 10.5px; font-weight: 800;
-    display: flex; align-items: center; justify-content: center;
+  .card .name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
   }
-  .card .name { font-size: 13px; font-weight: 700; color: var(--ink); }
-  .card .meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-  .tag { display: inline-block; font-size: 10.5px; padding: 1.5px 7px; border-radius: 20px; font-weight: 600; background: var(--gray-bg); color: var(--ink-soft); }
-  .tag.staff { font-weight: 800; font-size: 11px; padding: 2px 9px; }
+  .card .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 10.5px;
+    padding: 1.5px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+    background: var(--gray-bg);
+    color: var(--ink-soft);
+  }
+  .tag.staff { background: var(--blue-bg); color: var(--blue-ink); }
   .tag.date  { background: var(--orange-soft); color: var(--orange-deep); }
+  .tag.info  { background: var(--green-bg); color: var(--green-ink); }
   .tag.churn { background: #fbeaea; color: #b7392f; }
-  .tag.stall-ok { background: var(--green-bg, #e8f3ea); color: var(--green-ink, #2c7a44); }
-  .tag.stall-tier1 { background: #fbecc6; color: #8a6a14; font-weight: 700; }
-  .tag.stall-tier2 { background: #fbdcc0; color: #a3521a; font-weight: 700; }
-  .tag.stall-tier3 { background: #f8cfc9; color: #a3271e; font-weight: 800; }
-  .tag.renew-ok { background: #e3f2e8; color: #1f7a44; font-weight: 700; border: 1px solid #bfe3cb; }
-  .tag.renew-bad { background: #fdeceb; color: #b53326; font-weight: 800; border: 1px solid #f3c6c1; }
-  .card.tier1 { background: #fffaf0; border-color: #f2e2b6; }
-  .card.tier2 { background: #fff3e9; border-color: #f0cba8; }
-  .card.tier3 { background: #fdeeec; border-color: #edb9b1; }
-  .card.renew-tint-warn { background: #eef2fb; border-color: #ccdaf3; }
-  .card.renew-tint-bad { background: #fdeceb; border-color: #f0bcb5; }
-  .randy-link {
-    margin-left: auto; flex-shrink: 0; font-size: 13px; text-decoration: none;
-    color: var(--orange-deep); border: 1px solid var(--orange-soft); border-radius: 6px;
-    padding: 1px 6px; background: var(--orange-soft); cursor: pointer; font-family: inherit;
+  .card .note {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+    line-height: 1.4;
   }
-  .randy-link:hover { background: var(--orange); color: #fff; }
-  .card .note { font-size: 11px; color: var(--ink-soft); margin-top: 5px; line-height: 1.4; }
-  .card .note.churn-reason { color: #b7392f; font-weight: 600; }
-  .empty-col { padding: 24px 10px; text-align: center; font-size: 12px; color: #c9beb5; }
+  .empty-col {
+    padding: 24px 10px;
+    text-align: center;
+    font-size: 12px;
+    color: #c9beb5;
+  }
 
-  .side-note { margin-top: 18px; background: var(--card); border: 1px dashed var(--line); border-radius: 12px; padding: 12px 16px; }
-  .side-note summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
-  .side-note .cards { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  /* ---------- Land-owned side note ---------- */
+  .side-note {
+    margin-top: 18px;
+    background: var(--card);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .side-note summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .side-note .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
   .side-note .card { width: 200px; }
 
-  footer.note { margin-top: 16px; font-size: 11.5px; color: var(--ink-soft); text-align: right; }
-
-  .overlay { position: fixed; inset: 0; background: rgba(40,25,15,0.35); display: flex; align-items: center; justify-content: center; z-index: 50; }
-  .overlay.hidden { display: none; }
-  .modal { background: #fff; border-radius: 14px; padding: 22px 24px; width: 380px; max-width: 92vw; box-shadow: 0 12px 32px rgba(40,20,10,0.25); }
-  .modal.small { width: 320px; }
-  .modal h2 { font-size: 16px; margin: 0 0 14px; color: var(--orange-deep); }
-  .modal p.desc { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 12px; line-height: 1.5; }
-  .modal label { display: block; font-size: 12px; color: var(--ink-soft); margin: 10px 0 4px; }
-  .modal input[type="text"], .modal input[type="date"], .modal select, .modal textarea {
-    width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
-    font-size: 13px; font-family: inherit; background: var(--orange-pale);
+  footer.note {
+    margin-top: 16px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-align: right;
   }
-  .modal textarea { resize: vertical; min-height: 50px; }
-  .modal .row2 { display: flex; gap: 10px; }
-  .modal .row2 > div { flex: 1; }
-  .small-btn { padding: 8px 10px !important; font-size: 12px !important; white-space: nowrap; }
-  .survey-checks { display: flex; gap: 14px; margin-top: 4px; }
-  .survey-checks .chk { font-size: 12.5px; color: var(--ink); display: flex; align-items: center; gap: 5px; }
-  .card-survey { display: flex; gap: 8px; margin-top: 6px; }
-  .card-survey label { font-size: 10.5px; color: var(--ink-soft); display: flex; align-items: center; gap: 3px; cursor: pointer; }
-  .card-survey input[type="checkbox"] { cursor: pointer; }
-  .card-survey label.disabled { opacity: 0.4; cursor: not-allowed; }
-  .card-renewal { display: flex; margin-top: 6px; }
-  .card-renewal label { font-size: 10.5px; font-weight: 700; color: #2f5f9e; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-  .card-renewal input[type="checkbox"] { cursor: pointer; }
-  .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; }
-  .modal-actions.center { justify-content: flex-end; gap: 8px; }
-  .modal-actions .right { display: flex; gap: 8px; }
-  .btn-primary { background: var(--orange); color: #fff; border: none; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .btn-primary:hover { background: var(--orange-deep); }
-  .btn-plain { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); padding: 9px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-  .btn-plain:hover { background: var(--gray-bg); }
-  .btn-danger-solid { background: #b7392f; color: #fff; border: none; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .btn-danger-solid:hover { background: #96271f; }
-  .btn-danger { background: transparent; border: none; color: #b7392f; font-size: 12.5px; cursor: pointer; padding: 6px 4px; }
-  .btn-danger:hover { text-decoration: underline; }
-  .btn-danger.hidden { visibility: hidden; }
 
-  .lock-note { font-size: 11.5px; color: #b7392f; margin-top: 8px; display: none; }
-  .lock-note.show { display: block; }
-  #churnReasonWrap.hidden { display: none; }
-
-  .loading-msg { padding: 60px 10px; text-align: center; color: var(--ink-soft); font-size: 13px; }
-
-  .toast-wrap { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; align-items: center; }
-  .toast {
-    background: #2b2320; color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 8px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2); opacity: 0; transform: translateY(-8px);
-    transition: opacity 0.2s ease, transform 0.2s ease; max-width: 80vw; text-align: center;
+  @media (max-width: 1100px) {
+    .board { grid-template-columns: repeat(3, minmax(200px, 1fr)); }
   }
-  .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.error { background: #b7392f; }
-
-  /* ==== STEP5到達サプライズ（不要になったらこのブロックごと削除でOK） ==== */
-  .celebrate-banner {
-    position: fixed; top: 24px; left: 50%; transform: translate(-50%, -16px);
-    background: linear-gradient(135deg, var(--orange), var(--orange-deep));
-    color: #fff; padding: 14px 24px; border-radius: 12px; font-size: 15px; font-weight: 800;
-    box-shadow: 0 10px 26px rgba(180,60,20,0.35); z-index: 201; opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; white-space: nowrap;
+  @media (max-width: 640px) {
+    .board { grid-template-columns: 1fr; }
+    .wrap { padding: 16px 10px 40px; }
   }
-  .celebrate-banner.show { opacity: 1; transform: translate(-50%, 0); }
-  .confetti-piece {
-    position: fixed; top: -20px; width: 8px; height: 14px; border-radius: 2px;
-    opacity: 0.9; pointer-events: none; z-index: 200;
-    animation-name: confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards;
-  }
-  @keyframes confetti-fall {
-    to { transform: translateY(110vh) rotate(540deg); opacity: 0.2; }
-  }
-  /* ==== ここまで ==== */
-
-  @media (max-width: 1100px) { .board { grid-template-columns: repeat(3, minmax(200px, 1fr)); } }
-  @media (max-width: 640px) { .board { grid-template-columns: 1fr; } .wrap { padding: 16px 10px 40px; } }
 </style>
 </head>
 <body>
@@ -245,1290 +293,167 @@
       <div class="logo-chip">ラ</div>
       <div>
         <h1>ランディ ステップトラッカー</h1>
-        <div class="sub">土地探しから土地契約までの5ステップで、ランディ登録中のお客様（土地なし・削除客）の進捗を確認・更新できます</div>
+        <div class="sub">土地探しから土地契約までの5ステップで、登録中のお客様の進捗を確認できます</div>
       </div>
     </div>
-    <button class="add-btn" id="addBtn">＋ お客様を追加</button>
   </header>
 
-  <div class="share-banner">⚠️ このボードのデータはリンクを知っている人なら誰でも閲覧・編集できます。1人が編集している間、他の人は編集できないようにロックされます。</div>
-  <div class="whoami">あなたの表示名: <b id="whoamiName">未設定</b><button id="changeNameBtn">変更する</button></div>
-
   <div class="flow-bar" id="flowBar"></div>
-
-  <div class="reg-stat" id="regStat"></div>
-  <details class="side-note" id="monthlyRegDetails" style="margin-bottom:14px;margin-top:0;">
-    <summary>月別のランディ登録率を見る</summary>
-    <div id="monthlyRegTable" class="monthly-reg-table"></div>
-  </details>
-  <details class="side-note" id="fiscalRegDetails" style="margin-bottom:14px;margin-top:0;">
-    <summary>期別（7月始まり〜翌6月終わり）のランディ登録率を見る</summary>
-    <div id="fiscalRegTable" class="monthly-reg-table"></div>
-  </details>
-
-  <details class="side-note" id="staffLegendDetails" style="margin-bottom:14px;margin-top:0;">
-    <summary>担当別の登録率を見る</summary>
-    <div class="legend-staff" id="staffLegend"></div>
-  </details>
 
   <div class="toolbar">
     <input type="search" id="searchBox" placeholder="お客様名で検索...">
     <select id="staffFilter"><option value="">担当：すべて</option></select>
     <label class="chk"><input type="checkbox" id="showChurned"> 削除・解約客も表示</label>
-    <label class="chk"><input type="checkbox" id="showStalledOnly"> 停滞中のみ表示（14日以上動きなし）</label>
-    <button class="ghost" id="addStaffBtn">＋ メンバー追加</button>
-    <button class="ghost" id="pasteVisitBtn">📋 来場データを貼り付けて登録</button>
-    <button class="ghost" id="refreshBtn">最新の状態に更新</button>
-    <button class="ghost" id="resetBtn">絞り込みをリセット</button>
+    <button class="ghost" id="resetBtn">リセット</button>
     <span class="count" id="totalCount"></span>
   </div>
 
-  <div id="boardArea"><div class="loading-msg">読み込み中...</div></div>
+  <div class="board" id="board"></div>
 
-  <details class="side-note" id="backupDetails" style="margin-top:18px;">
-    <summary style="font-size:12px;color:var(--ink-soft);">その他の操作（データのバックアップ）</summary>
-    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="ghost" id="exportBackupBtn" style="font-size:12px;">💾 データを書き出す</button>
-      <button class="ghost" id="importBackupBtn" style="font-size:12px;">📂 データを読み込む</button>
-      <input type="file" id="importBackupFile" accept="application/json" style="display:none;">
-    </div>
+  <details class="side-note">
+    <summary id="landOwnedSummary">すでに土地あり・ランディ対象外のお客様</summary>
+    <div class="cards" id="landOwnedCards"></div>
   </details>
 
-  <footer class="note">初期データ: STEP タブ（ランディ集計）｜以降の追加・変更はこのボード上に保存されます</footer>
+  <footer class="note">元データ: STEP タブ（ランディ集計）｜ステップ区分は「ランディ ステップ資料」に準拠</footer>
 </div>
-
-<!-- Edit / Add modal -->
-<div class="overlay hidden" id="overlay">
-  <div class="modal">
-    <h2 id="modalTitle">お客様を追加</h2>
-    <input type="hidden" id="editId">
-    <label>お客様名</label>
-    <input type="text" id="fName" placeholder="例）山田　太郎様">
-    <div class="row2">
-      <div>
-        <label>担当</label>
-        <select id="fStaff"></select>
-      </div>
-      <div>
-        <label>登録日</label>
-        <input type="text" id="fMonth" placeholder="例）2026/07/01">
-      </div>
-    </div>
-    <label>ステップ</label>
-    <select id="fProgress">
-      <option value="">STEP 0（来場・検討開始）</option>
-      <option value="ST1">STEP 1（建物見学来場・ID発行・資金計画）</option>
-      <option value="ST2">STEP 2（お気に入り登録）</option>
-      <option value="ST3">STEP 3（土地相談）</option>
-      <option value="ST4">STEP 4（仮審査）</option>
-      <option value="ST5">STEP 5（プラン入り・買付・建築申込）</option>
-    </select>
-    <label>状態</label>
-    <select id="fChurn">
-      <option value="継続">継続</option>
-      <option value="削除">削除・解約</option>
-    </select>
-    <div id="churnReasonWrap">
-      <label>削除・解約の理由</label>
-      <textarea id="fChurnReason" placeholder="例）予算が合わず他社で契約、連絡が取れなくなった、など"></textarea>
-    </div>
-    <label>最終活動日（ランディでの動き）</label>
-    <input type="date" id="fLastActivity">
-    <label>閲覧期限（3ヶ月ごと・非公開物件の閲覧期限）</label>
-    <input type="date" id="fRenewalDate">
-    <div class="survey-checks">
-      <label class="chk"><input type="checkbox" id="fRenewalSent"> 📧 案内メール送信済み（今回分）</label>
-    </div>
-    <label>ランディ 顧客詳細URL</label>
-    <input type="text" id="fRandyUrl" placeholder="https://...">
-    <label>アンケート送信状況</label>
-    <div class="survey-checks">
-      <label class="chk"><input type="checkbox" id="fSurvey1"> ①2週間</label>
-      <label class="chk"><input type="checkbox" id="fSurvey2"> ②4週間</label>
-      <label class="chk"><input type="checkbox" id="fSurvey3"> ③3ヶ月</label>
-    </div>
-    <label>メモ</label>
-    <textarea id="fNote" placeholder="担当設計、提携不動産会社名、契約日など自由に記入"></textarea>
-    <div class="lock-note" id="lockNote"></div>
-    <div class="modal-actions">
-      <button class="btn-danger hidden" id="deleteBtn">このお客様を削除</button>
-      <div class="right">
-        <button class="btn-plain" id="cancelBtn">キャンセル</button>
-        <button class="btn-primary" id="saveBtn">保存</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Text entry modal (generic; replaces window.prompt) -->
-<div class="overlay hidden" id="nameOverlay">
-  <div class="modal small">
-    <h2 id="nameOverlayTitle">表示名を入力</h2>
-    <p class="desc" id="nameOverlayDesc">編集ロック（誰が編集中かを表示するため）に使う名前です。担当者名などでOKです。</p>
-    <input type="text" id="nameInput" placeholder="例）髙橋">
-    <div class="modal-actions center">
-      <button class="btn-plain" id="nameCancelBtn">キャンセル</button>
-      <button class="btn-primary" id="nameOkBtn">決定</button>
-    </div>
-  </div>
-</div>
-
-<!-- Link modal (fallback when a new tab can't be opened directly) -->
-<div class="overlay hidden" id="linkOverlay">
-  <div class="modal small">
-    <h2>ランディを開く</h2>
-    <p class="desc">この画面からは新しいタブを直接開けない場合があります。下のURLをコピーして、ブラウザで開いてください。</p>
-    <input type="text" id="linkUrlInput" readonly>
-    <div class="modal-actions center">
-      <button class="btn-plain" id="linkCloseBtn">閉じる</button>
-      <button class="btn-primary" id="linkCopyBtn">URLをコピー</button>
-    </div>
-  </div>
-</div>
-
-<!-- 来場アンケート管理からのテキストを手動で貼り付けるモーダル -->
-<div class="overlay hidden" id="visitPasteOverlay">
-  <div class="modal">
-    <h2>来場データを貼り付けて登録</h2>
-    <p class="desc">来場アンケート管理側でコピーしたテキストを、下の欄に貼り付けて(Ctrl+V / Cmd+V)「読み込む」を押してください。</p>
-    <textarea id="visitPasteInput" style="min-height:80px;" placeholder='{"source":"randy-handoff","name":"...","month":"...","staff":"..."}'></textarea>
-    <div class="modal-actions">
-      <div></div>
-      <div class="right">
-        <button class="btn-plain" id="visitPasteCancelBtn">キャンセル</button>
-        <button class="btn-primary" id="visitPasteOkBtn">読み込む</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Confirm modal (replaces window.confirm) -->
-<div class="overlay hidden" id="confirmOverlay">
-  <div class="modal small">
-    <h2 id="confirmTitle">確認</h2>
-    <p class="desc" id="confirmMessage"></p>
-    <div class="modal-actions center">
-      <button class="btn-plain" id="confirmNoBtn">キャンセル</button>
-      <button class="btn-danger-solid" id="confirmYesBtn">削除する</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-/* ============================================================
-   Cloudflare Worker 経由でのデータ保存設定
-   ------------------------------------------------------------
-   GitHubのトークンをこのファイルに直接書かず、Cloudflare Workers側の
-   「Secret」に隠して、Workerを中継役として使う方式です。
-   下のWORKER_URLに、デプロイしたWorkerのURLを貼り付けてください。
-   （例: "https://randy-proxy.your-subdomain.workers.dev"）
-   空欄のままにした場合は、自動的に元のwindow.storage
-   （Claude側の共有保存）にフォールバックします。
-   ============================================================ */
-const WORKER_URL = "https://randy-proxy.shimada-c1e.workers.dev"; // ここにCloudflare WorkerのURLを貼り付けてください
-
-if (WORKER_URL) {
-  const base = WORKER_URL.replace(/\/$/, "");
-
-  async function workerErrorDetail(res) {
-    try {
-      const body = await res.json();
-      if (body && body.error) return body.error;
-    } catch (e) { /* ignore */ }
-    return "status " + res.status;
-  }
-
-  window.storage = {
-    async get(key /*, shared */) {
-      const res = await fetch(`${base}/store?t=${Date.now()}`);
-      if (!res.ok) throw new Error("Worker get failed: " + (await workerErrorDetail(res)));
-      const data = await res.json();
-      if (!(key in data)) throw new Error("key not found");
-      return { key, value: data[key], shared: true };
-    },
-    async set(key, value /*, shared */) {
-      const res = await fetch(`${base}/set`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, value }),
-      });
-      if (!res.ok) throw new Error("Worker set failed: " + (await workerErrorDetail(res)));
-      return { key, value, shared: true };
-    },
-    async delete(key /*, shared */) {
-      const res = await fetch(`${base}/delete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key }),
-      });
-      if (!res.ok) throw new Error("Worker delete failed: " + (await workerErrorDetail(res)));
-      return { key, deleted: true, shared: true };
-    },
-    async list(prefix) {
-      const res = await fetch(`${base}/store?t=${Date.now()}`);
-      if (!res.ok) throw new Error("Worker list failed: " + (await workerErrorDetail(res)));
-      const data = await res.json();
-      const keys = Object.keys(data).filter(k => !prefix || k.startsWith(prefix));
-      return { keys, prefix, shared: true };
-    },
-  };
-}
-/* ============================================================ */
-
-const SEED = [{"id": "seed-1", "month": "2025/11/26", "name": "安藤　晃輝様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2025/11/01 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-2", "month": "2025/11/27", "name": "千田　直彦様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2025/11/10 ／ お気に入り登録 0 ／ 問合数 2", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-3", "month": "2025/11/28", "name": "松島　佳祐様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2025/11/15 ／ お気に入り登録 0", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-4", "month": "2025/11/29", "name": "小泉　匡禎様（植原様）", "staff": "島田", "progress": "ST5", "land": "無", "churn": "削除", "note": "登録日 2025/11/22", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-8", "month": "2025/12/16", "name": "河本　剛様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2025/12/01 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-12", "month": "2025/12/21", "name": "桂　有理雄様（裕子様）", "staff": "島田", "progress": "ST5", "land": "無", "churn": "継続", "note": "登録日 2026/02/08 ／ 建築申込 2026/01/15", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-14", "month": "2026/01/10", "name": "今野　卓也様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/10 ／ お気に入り登録 0 ／ 問合数 2", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-15", "month": "2026/01/10", "name": "下田　浩太郎様", "staff": "島田", "progress": "ST1", "land": "無", "churn": "削除", "note": "登録日 2026/01/10 ／ ID発行 2026/01/10", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-16", "month": "2026/01/11", "name": "栗原　みなみ様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/11 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-17", "month": "2026/01/10", "name": "岩崎　智子様", "staff": "山崎", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/01/10 ／ ID発行 2026/01/11 ／ 資金計画 自営業", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-18", "month": "2026/01/10", "name": "関根　彩乃様", "staff": "細野", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/01/10", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-19", "month": "2026/01/11", "name": "坪井　愛様", "staff": "細野", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/11 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-20", "month": "2026/01/10", "name": "髙橋　義大様", "staff": "山﨑", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/10 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-25", "month": "2026/01/11", "name": "林　唯奈様", "staff": "星野", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/01/11", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-34", "month": "2026/01/24", "name": "嶋村　憂太様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/25 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-35", "month": "2026/02/01", "name": "高倉　悠里様", "staff": "宮田", "progress": "ST3", "land": "無", "churn": "削除", "note": "登録日 2026/02/01", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-40", "month": "2026/02/06", "name": "澤田　正之様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/02/10 ／ お気に入り登録 1~4 ／ 問合数 2", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-45", "month": "2026/02/11", "name": "木口　幸祐様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/02/17 ／ お気に入り登録 5~ ／ 問合数 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-46", "month": "2026/02/12", "name": "若林　七虹様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/02/21 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-47", "month": "2026/02/13", "name": "金子　杏実様", "staff": "島田", "progress": "ST0", "land": "無", "churn": "削除", "note": "登録日 2026/02/22", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-49", "month": "2026/02/15", "name": "大谷　凱斗様", "staff": "宮田", "progress": "ST3", "land": "無", "churn": "継続", "note": "登録日 2026/02/22 ／ 担当設計 北爪", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-50", "month": "2026/02/16", "name": "丸橋　敏也様", "staff": "細野", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/02/22 ／ ID発行 2026/02/22 ／ 資金計画 2/22", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-53", "month": "2026/02/07", "name": "大川　儀晃様", "staff": "星野", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/02/21 ／ ID発行 2/21 ／ 資金計画 3/20", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-56", "month": "2026/03/07", "name": "春日　結衣様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/03/07 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-65", "month": "2026/03/07", "name": "高橋　星南様", "staff": "宮田", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/03/20 ／ ID発行 3/20 ／ 資金計画 3/21", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-67", "month": "2026/03/07", "name": "森　彩芽様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/03/22 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-68", "month": "2026/03/07", "name": "大堀　晃様", "staff": "宮田", "progress": "ST3", "land": "無", "churn": "継続", "note": "登録日 2026/03/22 ／ 担当設計 北爪", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-69", "month": "2026/03/30", "name": "今川　翔太郎様", "staff": "島田", "progress": "ST5", "land": "無", "churn": "継続", "note": "登録日 2026/03/30", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-70", "month": "2026/03/30", "name": "北野　友貴様", "staff": "髙橋", "progress": "ST5", "land": "無", "churn": "継続", "note": "登録日 2026/03/15 ／ 提携先 ㈱ﾀｸﾏ不動産販売", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-71", "month": "2026/04/30", "name": "都丸　裕矢様", "staff": "島田", "progress": "ST1", "land": "無", "churn": "継続", "note": "", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-72", "month": "2026/04/30", "name": "上田　智也様", "staff": "髙橋", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/04/12 ／ ID発行 4/12 ／ 資金計画 4/12", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-73", "month": "2026/04/30", "name": "堀　朋貴様", "staff": "髙橋", "progress": "ST3", "land": "無", "churn": "継続", "note": "登録日 2026/04/12 ／ 担当設計 星野", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-74", "month": "2026/04/30", "name": "伊藤　仁様", "staff": "島田", "progress": "ST1", "land": "無", "churn": "削除", "note": "", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-75", "month": "2026/04/26", "name": "針谷　俊様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/04/05 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-76", "month": "2026/04/26", "name": "新井　渉様", "staff": "髙橋", "progress": "ST0", "land": "無", "churn": "削除", "note": "登録日 2026/04/26", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-77", "month": "2026/05/02", "name": "片桐　剣大様", "staff": "島田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/05/02", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-78", "month": "2026/05/02", "name": "井野　彰紀様", "staff": "宮田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/05/09", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-79", "month": "2026/05/02", "name": "多畑　勇志様", "staff": "宮田", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/05/09 ／ ID発行 5/9", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-80", "month": "2026/05/02", "name": "深澤　佳菜様", "staff": "宮田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/05/09", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-81", "month": "2026/05/02", "name": "二葉　夏樹様", "staff": "細野", "progress": "ST0", "land": "無", "churn": "継続", "note": "", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-82", "month": "2026/05/02", "name": "高橋　元輝様(亜優様)", "staff": "宮田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/05/10 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-83", "month": "2026/05/26", "name": "宮川　弥生様", "staff": "宮田", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/05/31 ／ ID発行 5/31", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-84", "month": "2026/05/26", "name": "土屋　花衣様", "staff": "星野", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/05/25 ／ ID発行 5/25 ／ 資金計画 5/25", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-85", "month": "2026/06/14", "name": "島田　結花様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/06/14 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-86", "month": "2026/06/14", "name": "倉澤　尚吾様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/06/14 ／ お気に入り登録 5~ ／ 問合数 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-87", "month": "2026/06/14", "name": "小須賀　瑞穂様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/06/22 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-88", "month": "2026/06/14", "name": "藤井　美久様", "staff": "宮田", "progress": "", "land": "無", "churn": "継続", "note": "登録日 2026/06/20", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-89", "month": "2026/06/14", "name": "加藤　健太様", "staff": "島田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/06/26", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}];
-const STORAGE_KEY = "randy-step-tracker-customers";
-const LOCK_KEY = "randy-step-tracker-lock";
-const LOCK_TTL_MS = 3 * 60 * 1000;
+const RAW = {"headers": ["月別", "NO. ", "お客様名", "担当", "進捗", "ステップ用　アンケート", "お困りごと　アンケート", "状況確認　アンケート", "土地", "削除客", "初回来場", "2回目来場", "ID発行日　連携日", "資金計画", "お気入登録", "問合せ", "問合数", "土地相談", "担当設計", "仮審査", "買い付け", "不動産会社名", "プラン依頼", "建築申込", "ご契約"], "rows": [["2025/11/25", "", "新井　孝太様", "高橋", "", "", "", "", "有", "削除", "2025/11/01", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2025/11/26", "", "安藤　晃輝様", "髙橋", "ST2", "2026/03/16", "", "", "無", "継続", "2025/11/01", "", "2025/11/01", "2025/11/01", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2025/11/27", "", "千田　直彦様", "島田", "ST2", "2026/03/06", "", "", "無", "継続", "2025/11/10", "2025/11/21", "2025/11/10", "2025/11/10", "0", "有", "2", "", "", "", "", "", "", "", ""], ["2025/11/28", "", "松島　佳祐様", "髙橋", "ST2", "2026/03/17", "", "", "無", "継続", "2025/11/15", "", "2025/11/15", "2025/11/15", "0", "無", "", "", "", "", "", "", "", "", ""], ["2025/11/29", "", "小泉　匡禎様（植原様）", "島田", "ST5", "", "", "", "無", "削除", "2025/11/22", "2026/12/07", "2025/11/22", "2025/11/22", "5~", "有", "3", "〇", "星野", "", "", "", "2026/02/03", "", ""], ["2025/11/30", "", "阿久澤　悠介様", "高橋", "", "", "", "", "有", "継続", "2025/11/27", "", "", "2025/11/27", "", "", "", "", "", "", "", "", "", "", ""], ["2025/11/25", "", "深澤　巧様", "島田", "", "", "", "", "有", "継続", "2025/11/29", "", "", "2025/11/29", "", "", "", "", "", "", "", "", "", "", ""], ["2025/12/15", "", "中山　久美子様", "髙橋", "", "", "", "", "有", "継続", "2025/12/01", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2025/12/16", "", "河本　剛様", "髙橋", "ST2", "2026/03/17", "", "", "無", "削除", "2025/12/01", "", "2025/12/01", "", "5~", "無", "", "", "", "", "", "", "", "", ""], ["2025/12/17", "", "佐々木　照様", "島田", "", "", "", "", "有", "継続", "2025/12/02", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2025/12/18", "", "井上　建人様", "島田", "", "", "", "", "有", "継続", "2025/12/06", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2025/12/19", "", "小林　恵美子様", "髙橋", "", "", "", "", "有", "継続", "2025/12/11", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2025/12/21", "", "桂　有理雄様（裕子様）", "島田", "ST5", "2026/03/09", "", "", "無", "継続", "2026/02/08", "", "2026/12/21", "2026/12/21", "5~", "無", "", "〇", "北爪", "", "", "", "", "2026/01/15", ""], ["2026/01/07", "", "目黒　花子様", "髙橋", "", "", "", "", "有", "", "2026/01/07", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "今野　卓也様", "島田", "ST2", "2026/03/27", "", "2026/06/27", "無", "継続", "2026/01/10", "2026/01/31", "2026/01/10", "2026/01/31", "0", "有", "2", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "下田　浩太郎様", "島田", "ST1", "2026/03/27", "", "", "無", "削除", "2026/01/10", "", "2026/01/10", "", "0", "無", "", "", "", "", "", "", "", "", ""], ["2026/01/11", "", "栗原　みなみ様", "島田", "ST2", "ー", "", "", "無", "継続", "2026/01/11", "", "2026/01/11", "", "1~4", "有", "", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "岩崎　智子様", "山崎", "ST1", "2026/05/10", "", "", "無", "継続", "2026/01/10", "2026/01/11", "2026/01/11", "自営業", "0", "有", "3", "", "山崎", "", "", "", "", "", ""], ["2026/01/10", "", "関根　彩乃様", "細野", "ST0", "", "", "", "無", "継続", "2026/01/10", "", "ー", "2026/01/10", "0", "", "", "", "", "", "", "", "", "", ""], ["2026/01/11", "", "坪井　愛様", "細野", "ST2", "2026/06/02", "", "", "無", "継続", "2026/01/11", "", "2026/01/11", "2026/01/11", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "髙橋　義大様", "山﨑", "ST2", "", "", "", "無", "継続", "2026/01/10", "", "2026/01/10", "", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "髙木　光男様", "山﨑", "", "", "", "", "有", "継続", "2026/01/10", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "小見　芳子様", "山﨑", "", "", "", "", "有", "継続", "2026/01/10", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/11", "", "野村　亮知様", "山﨑", "", "", "", "", "有", "継続", "2026/01/11", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/11", "", "小此木　直人様", "星野", "", "", "", "", "有", "継続", "2026/01/11", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/11", "", "林　唯奈様", "星野", "ST0", "", "", "", "無", "継続", "2026/01/11", "", "ー", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/10", "", "飯塚　麻弥斗様", "髙橋", "", "", "", "", "有", "継続", "2026/01/10", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/11", "", "山田　祥子様", "島田", "", "", "", "", "有", "継続", "2026/01/11", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/12", "", "内海　樹様", "島田", "", "", "", "", "有", "継続", "2026/01/17", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/13", "", "田代　江太郎様", "宮田", "", "", "", "", "有", "継続", "2026/01/18", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/20", "", "山田　祥子様", "島田", "", "", "", "", "有", "削除", "2026/01/11", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/21", "", "内海　樹様", "島田", "", "", "", "", "有", "削除", "2026/01/17", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/22", "", "田代　江太郎様", "宮田", "", "", "", "", "有", "継続", "2026/01/18", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/23", "", "冨加津　卓様", "髙橋", "", "", "", "", "有", "継続", "2026/01/22", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/01/24", "", "嶋村　憂太様", "島田", "ST2", "2026/06/01", "", "", "無", "継続", "2026/01/25", "2026/02/08", "2026/01/25", "2026/01/25", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/02/01", "", "高倉　悠里様", "宮田", "ST3", "", "", "", "無", "削除", "2026/02/01", "2026/02/07", "2/1", "2/1", "5~", "有", "1", "〇", "", "", "", "", "", "", ""], ["2026/02/07", "", "神　巧磨様", "髙橋", "", "", "", "", "有", "継続", "2026/02/07", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/03", "", "齊籐　達也様", "島田", "", "", "", "", "有", "継続", "2026/02/03", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/04", "", "佐藤　愛香様", "髙橋", "", "", "", "", "有", "継続", "2026/02/08", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/05", "", "野垣　和也様", "星野", "", "", "", "", "有", "継続", "2026/02/07", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/06", "", "澤田　正之様", "島田", "ST2", "", "", "", "無", "削除", "2026/02/10", "2026/02/10", "2/10", "2/10", "1~4", "有", "2", "", "", "", "", "", "", "", ""], ["2026/02/07", "", "阿久澤　一樹様", "宮田", "", "", "", "", "有", "継続", "2026/02/13", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/08", "", "下田　歩夢様", "髙橋", "", "", "", "", "有", "継続", "2026/02/15", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/09", "", "城戸　真理子様", "髙橋", "", "", "", "", "有", "継続", "2026/02/15", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/10", "", "五十嵐　理恵様", "宮田", "ST0", "", "", "", "有", "継続", "2026/02/19", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/11", "", "木口　幸祐様", "島田", "ST2", "2026/03/23", "", "", "無", "削除", "2026/02/17", "2026/03/23", "2026/02/17", "2026/02/17", "5~", "有", "5~", "", "", "", "", "", "", "", ""], ["2026/02/12", "", "若林　七虹様", "島田", "ST2", "2026/03/11", "", "", "無", "継続", "2026/02/21", "", "2026/02/21", "", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/02/13", "", "金子　杏実様", "島田", "ST0", "", "", "", "無", "削除", "2026/02/22", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/14", "", "和田　花織様", "宮田", "", "", "", "", "有", "継続", "2026/02/21", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/15", "", "大谷　凱斗様", "宮田", "ST3", "2026/06/27", "", "", "無", "継続", "2026/02/22", "2026/03/01", "2026/03/01", "3/1", "", "無", "", "〇", "北爪", "", "", "", "", "", ""], ["2026/02/16", "", "丸橋　敏也様", "細野", "ST1", "2026/06/21", "", "", "無", "継続", "2026/02/22", "", "2026/02/22", "2/22", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/17", "", "田作　美里様", "髙橋", "", "", "", "", "有", "継続", "2026/02/22", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/18", "", "志田　智明様", "髙橋", "", "", "", "", "有", "継続", "2026/02/22", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/02/07", "", "大川　儀晃様", "星野", "ST1", "2026/05/11", "", "", "無", "継続", "2026/02/21", "2026/03/20", "2/21", "3/20", "0", "無", "", "", "", "", "", "", "", "", ""], ["2026/03/05", "", "木村　太一様", "宮田", "", "", "", "", "有", "継続", "2026/03/05", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/06", "", "金井　智樹様", "島田", "", "", "", "", "有", "削除", "2026/03/02", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "春日　結衣様", "髙橋", "ST2", "2026/05/21", "", "", "無", "削除", "2026/03/07", "", "3/7", "3/7", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/03/08", "", "藤本　弥子様", "髙橋", "", "", "", "", "有", "継続", "2026/03/08", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/09", "", "木暮　祐介様", "島田", "", "", "", "", "有", "継続", "2026/03/09", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/10", "", "関　美枝様", "髙橋", "", "", "", "", "有", "継続", "2026/03/09", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/10", "", "高橋　まゆみ様", "宮田", "", "", "", "", "有", "継続", "2026/03/12", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/10", "", "浅海　翔柄様", "髙橋", "", "", "", "", "有", "継続", "2026/03/14", "", "", "2026/03/14", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "渡邉　勇紀様", "島田", "", "", "", "", "有", "継続", "2026/03/15", "", "", "2026/03/15", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "織田　光明様", "髙橋", "", "", "", "", "有", "削除", "2026/03/16", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "大西　暁博様", "髙橋", "", "", "", "", "有", "継続", "2026/03/20", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "高橋　星南様", "宮田", "ST1", "", "", "", "無", "継続", "2026/03/20", "", "3/20", "3/21", "0", "無", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "中島　知也様", "髙橋", "", "", "", "", "有", "継続", "2026/03/21", "", "3/22", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "森　彩芽様", "髙橋", "ST2", "", "", "", "無", "削除", "2026/03/22", "2026/03/23", "3/22", "3/22", "5~", "無", "", "", "", "", "", "", "", "", ""], ["2026/03/07", "", "大堀　晃様", "宮田", "ST3", "2026/06/27", "", "", "無", "継続", "2026/03/22", "2026/03/28", "3/22", "3/22", "0", "無", "", "〇", "北爪", "", "", "", "", "", ""], ["2026/03/30", "", "今川　翔太郎様", "島田", "ST5", "2026/04/13", "", "", "無", "継続", "2026/03/30", "2026/04/26", "3/30", "3/30", "5~", "有", "5~", "〇", "星野", "", "", "", "済", "", ""], ["2026/03/30", "", "北野　友貴様", "髙橋", "ST5", "2026/03/28", "", "", "無", "継続", "2026/03/15", "", "3/15", "3/15", "1~4", "有", "2", "〇", "北爪", "", "〇", "㈱ﾀｸﾏ不動産販売", "〇", "", ""], ["2026/04/30", "", "都丸　裕矢様", "島田", "ST1", "", "", "", "無", "継続", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/04/30", "", "上田　智也様", "髙橋", "ST1", "2026/05/21", "", "", "無", "継続", "2026/04/12", "", "4/12", "4/12", "5~", "無", "", "", "", "", "", "", "", "", ""], ["2026/04/30", "", "堀　朋貴様", "髙橋", "ST3", "2026/05/21", "", "", "無", "継続", "2026/04/12", "", "4/12", "4/12", "5~", "無", "1", "〇", "星野", "", "", "", "", "", ""], ["2026/04/30", "", "伊藤　仁様", "島田", "ST1", "", "", "", "無", "削除", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/04/26", "", "針谷　俊様", "髙橋", "ST2", "2026/05/21", "", "", "無", "継続", "2026/04/05", "", "4/5", "4/5", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/04/26", "", "新井　渉様", "髙橋", "ST0", "", "", "", "無", "削除", "2026/04/26", "", "", "4/26", "", "", "", "", "", "", "", "", "", "", ""], ["2026/05/02", "", "片桐　剣大様", "島田", "ST0", "2026/06/01", "", "", "無", "継続", "2026/05/02", "2026/06/20", "ー", "5/2", "", "", "", "", "", "", "", "", "", "", ""], ["2026/05/02", "", "井野　彰紀様", "宮田", "ST0", "", "", "", "無", "継続", "2026/05/09", "2026/06/21", "ー", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/05/02", "", "多畑　勇志様", "宮田", "ST1", "2026/06/27", "", "", "無", "継続", "2026/05/09", "", "5/9", "", "0", "無", "", "", "", "", "", "", "", "", ""], ["2026/05/02", "", "深澤　佳菜様", "宮田", "ST0", "", "", "", "無", "継続", "2026/05/09", "", "ー", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/05/02", "", "二葉　夏樹様", "細野", "ST0", "", "", "", "無", "継続", "", "", "ー", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/05/02", "", "高橋　元輝様(亜優様)", "宮田", "ST2", "2026/06/27", "", "", "無", "継続", "2026/05/10", "", "5/10", "", "5~", "無", "", "", "", "", "", "", "", "", ""], ["2026/05/26", "", "宮川　弥生様", "宮田", "ST1", "2026/06/25", "", "", "無", "継続", "2026/05/31", "", "5/31", "", "0", "無", "", "", "", "", "", "", "", "", ""], ["2026/05/26", "", "土屋　花衣様", "星野", "ST1", "2026/05/25", "", "", "無", "継続", "2026/05/25", "", "5/25", "5/25", "0", "無", "", "〇", "星野", "", "", "並木ホーム（奥様のお母様のお知り合い", "", "", ""], ["2026/06/14", "", "島田　結花様", "髙橋", "ST2", "", "", "", "無", "継続", "2026/06/14", "", "6/14", "6/14", "5~", "無", "", "", "", "", "", "", "", "", ""], ["2026/06/14", "", "倉澤　尚吾様", "島田", "ST2", "", "", "", "無", "継続", "2026/06/14", "", "6/14", "6/14", "5~", "有", "5~", "", "", "", "", "", "", "", ""], ["2026/06/14", "", "小須賀　瑞穂様", "髙橋", "ST2", "", "", "", "無", "継続", "2026/06/22", "", "6/22", "6/22", "1~4", "無", "", "", "", "", "", "", "", "", ""], ["2026/06/14", "", "藤井　美久様", "宮田", "", "", "", "", "無", "継続", "2026/06/20", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], ["2026/06/14", "", "加藤　健太様", "島田", "ST0", "", "", "", "無", "継続", "2026/06/26", "", "ー", "6/26", "", "", "", "", "", "", "", "", "", "", ""]]};
+const HEADERS = RAW.headers;
+const ROWS = RAW.rows;
+const IDX = { month:0, name:2, staff:3, progress:4, land:8, churn:9,
+  firstVisit:10, secondVisit:11, idIssue:12, plan:13,
+  favorite:14, inquiry:15, inquiryCount:16,
+  landConsult:17, designer:18, prescreen:19,
+  offer:20, agency:21, planReq:22, buildApp:23, contract:24 };
 
 const COLUMNS = [
   { key:"", tag:"STEP 0", name:"来場・検討開始", accent:"#a89a8d", tint:"#f5f1ec" },
-  { key:"ST1", tag:"STEP 1", name:"建物見学来場・ID発行・資金計画", accent:"#e2825f", tint:"#fdece4" },
+  { key:"ST1", tag:"STEP 1", name:"ID発行・資金計画", accent:"#e2825f", tint:"#fdece4" },
   { key:"ST2", tag:"STEP 2", name:"お気に入り登録", accent:"#dc6c47", tint:"#fce6dc" },
   { key:"ST3", tag:"STEP 3", name:"土地相談", accent:"#d65731", tint:"#fbe0d3" },
   { key:"ST4", tag:"STEP 4", name:"仮審査", accent:"#c94824", tint:"#fad9ca" },
-  { key:"ST5", tag:"STEP 5", name:"プラン入り・買付・建築申込", accent:"#b53d1f", tint:"#f8d1bf" },
+  { key:"ST5", tag:"STEP 5", name:"買付・建築申込", accent:"#b53d1f", tint:"#f8d1bf" },
 ];
 
-const STAFF_PALETTE = [
-  { bg:"#e8f1fb", text:"#2f5f9e" },
-  { bg:"#eaf6ee", text:"#2c7a44" },
-  { bg:"#fdeee0", text:"#b5661f" },
-  { bg:"#f2ecfa", text:"#6b4ba0" },
-  { bg:"#fdeaf0", text:"#a83b6a" },
-  { bg:"#e9f7f6", text:"#1f7d78" },
-  { bg:"#f7f3e2", text:"#8a7314" },
-  { bg:"#eef0f7", text:"#4a5578" },
-  { bg:"#fbeaea", text:"#b7392f" },
-  { bg:"#eef7ea", text:"#5a8a2c" },
-  { bg:"#f0eefc", text:"#5b4fa8" },
-  { bg:"#fdf0e6", text:"#c4551f" },
-];
+function isChurned(r) { return r[IDX.churn] === "削除"; }
+function ownsLand(r) { return r[IDX.land] === "有"; }
 
-let customers = [];
-let staffList = [];
-let sessionId = "s-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
-let currentUser = "";
-
-const STAFF_KEY = "randy-step-tracker-staff-list";
-const DEFAULT_STAFF = ["髙橋", "島田", "宮田", "星野", "細野", "山﨑"];
-
-async function loadStaffList() {
-  try {
-    const res = await window.storage.get(STAFF_KEY, true);
-    staffList = res && res.value ? JSON.parse(res.value) : DEFAULT_STAFF.slice();
-  } catch (e) {
-    staffList = DEFAULT_STAFF.slice();
-    try { await window.storage.set(STAFF_KEY, JSON.stringify(staffList), true); } catch (e2) { /* ignore */ }
+function cardNote(r, colKey) {
+  const parts = [];
+  if (colKey === "" ) {
+    if (r[IDX.firstVisit]) parts.push("初回来場 " + r[IDX.firstVisit]);
+  } else if (colKey === "ST1") {
+    if (r[IDX.idIssue]) parts.push("ID発行 " + r[IDX.idIssue]);
+    if (r[IDX.plan]) parts.push("資金計画 " + r[IDX.plan]);
+  } else if (colKey === "ST2") {
+    if (r[IDX.favorite]) parts.push("お気に入り登録 " + r[IDX.favorite]);
+    if (r[IDX.inquiryCount]) parts.push("問合数 " + r[IDX.inquiryCount]);
+  } else if (colKey === "ST3") {
+    if (r[IDX.designer]) parts.push("担当設計 " + r[IDX.designer]);
+  } else if (colKey === "ST4") {
+    if (r[IDX.prescreen]) parts.push("仮審査 " + r[IDX.prescreen]);
+  } else if (colKey === "ST5") {
+    if (r[IDX.agency]) parts.push("提携先 " + r[IDX.agency]);
+    if (r[IDX.buildApp]) parts.push("建築申込 " + r[IDX.buildApp]);
+    if (r[IDX.contract]) parts.push("契約 " + r[IDX.contract]);
   }
+  return parts.join(" ／ ");
 }
 
-async function saveStaffList() {
-  try {
-    const result = await window.storage.set(STAFF_KEY, JSON.stringify(staffList), true);
-    if (!result) toast("メンバーリストの保存に失敗しました。", true);
-  } catch (e) {
-    toast("メンバーリストを保存できませんでした：" + (e && e.message ? e.message : "原因不明のエラー"), true);
-  }
-}
-
-async function addStaffMember(name) {
-  if (!name) return false;
-  if (staffList.includes(name)) {
-    toast(`「${name}」はすでに登録されています。`, true);
-    return false;
-  }
-  staffList.push(name);
-  await saveStaffList();
-  toast(`「${name}」を追加しました。`);
-  return true;
-}
-
-function populateStaffFieldSelect(selected) {
-  const sel = document.getElementById("fStaff");
-  const names = staffList.slice().sort((a, b) => a.localeCompare(b, "ja"));
-  let optionsHtml = names.map(n => `<option value="${n}">${n}</option>`).join("");
-  if (selected && !names.includes(selected)) {
-    optionsHtml = `<option value="${selected}">${selected}（未登録）</option>` + optionsHtml;
-  }
-  optionsHtml += `<option value="__add__">＋ 新しいメンバーを追加...</option>`;
-  sel.innerHTML = optionsHtml;
-  sel.value = selected || names[0] || "__add__";
-}
-
-function uid() { return "c-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8); }
-
-let staffColorMap = {};
-
-function assignStaffColors() {
-  const master = staffList.slice().sort((a, b) => a.localeCompare(b, "ja"));
-  const extras = Array.from(new Set(customers.map(c => c.staff).filter(Boolean)))
-    .filter(n => !master.includes(n))
-    .sort((a, b) => a.localeCompare(b, "ja"));
-  const names = master.concat(extras);
-  staffColorMap = {};
-  names.forEach((name, i) => {
-    staffColorMap[name] = STAFF_PALETTE[i % STAFF_PALETTE.length];
-  });
-}
-
-function staffColor(name) {
-  if (!name) return STAFF_PALETTE[0];
-  return staffColorMap[name] || STAFF_PALETTE[0];
-}
-
-/* ---------- Toast (replaces alert) ---------- */
-function toast(message, isError) {
-  const wrap = document.getElementById("toastWrap");
-  const el = document.createElement("div");
-  el.className = "toast" + (isError ? " error" : "");
-  el.textContent = message;
-  wrap.appendChild(el);
-  requestAnimationFrame(() => el.classList.add("show"));
-  setTimeout(() => {
-    el.classList.remove("show");
-    setTimeout(() => el.remove(), 250);
-  }, 3200);
-}
-
-/* ==== STEP5到達サプライズ（不要になったらこの関数ごと削除し、呼び出し箇所も外せばOK） ==== */
-const CONFETTI_COLORS = ["#d9502c", "#e2825f", "#f2c14e", "#4fa37a", "#4a7fc7", "#a86bc7"];
-function celebrateStep5(name) {
-  const banner = document.createElement("div");
-  banner.className = "celebrate-banner";
-  banner.textContent = `🎉 ${name || "お客様"} が STEP5 に到達しました！`;
-  document.body.appendChild(banner);
-  requestAnimationFrame(() => banner.classList.add("show"));
-  setTimeout(() => {
-    banner.classList.remove("show");
-    setTimeout(() => banner.remove(), 300);
-  }, 2800);
-
-  const pieceCount = 24;
-  for (let i = 0; i < pieceCount; i++) {
-    const el = document.createElement("div");
-    el.className = "confetti-piece";
-    el.style.left = Math.random() * 100 + "vw";
-    el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-    const duration = 1.8 + Math.random() * 1.2;
-    el.style.animationDuration = duration + "s";
-    el.style.animationDelay = (Math.random() * 0.3) + "s";
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), (duration + 0.4) * 1000);
-  }
-}
-/* ==== ここまで ==== */
-
-/* ---------- Generic text modal (replaces prompt) ---------- */
-function askText(title, desc, placeholder, defaultValue) {
-  return new Promise((resolve) => {
-    const overlay = document.getElementById("nameOverlay");
-    document.getElementById("nameOverlayTitle").textContent = title;
-    document.getElementById("nameOverlayDesc").textContent = desc;
-    const input = document.getElementById("nameInput");
-    input.placeholder = placeholder || "";
-    input.value = defaultValue || "";
-    overlay.classList.remove("hidden");
-    input.focus();
-
-    function cleanup() {
-      overlay.classList.add("hidden");
-      okBtn.removeEventListener("click", onOk);
-      cancelBtn.removeEventListener("click", onCancel);
-      input.removeEventListener("keydown", onKey);
-    }
-    function onOk() {
-      const v = input.value.trim();
-      cleanup();
-      resolve(v || null);
-    }
-    function onCancel() {
-      cleanup();
-      resolve(null);
-    }
-    function onKey(e) {
-      if (e.key === "Enter") onOk();
-      if (e.key === "Escape") onCancel();
-    }
-    const okBtn = document.getElementById("nameOkBtn");
-    const cancelBtn = document.getElementById("nameCancelBtn");
-    okBtn.addEventListener("click", onOk);
-    cancelBtn.addEventListener("click", onCancel);
-    input.addEventListener("keydown", onKey);
-  });
-}
-
-/* ---------- Confirm modal (replaces confirm) ---------- */
-function askConfirm(title, message) {
-  return new Promise((resolve) => {
-    const overlay = document.getElementById("confirmOverlay");
-    document.getElementById("confirmTitle").textContent = title;
-    document.getElementById("confirmMessage").textContent = message;
-    overlay.classList.remove("hidden");
-
-    function cleanup() {
-      overlay.classList.add("hidden");
-      yesBtn.removeEventListener("click", onYes);
-      noBtn.removeEventListener("click", onNo);
-    }
-    function onYes() { cleanup(); resolve(true); }
-    function onNo() { cleanup(); resolve(false); }
-    const yesBtn = document.getElementById("confirmYesBtn");
-    const noBtn = document.getElementById("confirmNoBtn");
-    yesBtn.addEventListener("click", onYes);
-    noBtn.addEventListener("click", onNo);
-  });
-}
-
-/* ---------- Randy link opener (with fallback if popups are blocked) ---------- */
-function showLinkModal(url) {
-  const overlay = document.getElementById("linkOverlay");
-  const input = document.getElementById("linkUrlInput");
-  input.value = url;
-  overlay.classList.remove("hidden");
-  input.focus();
-  input.select();
-}
-
-function openRandyLink(url) {
-  if (!url) return;
-  let win = null;
-  try {
-    win = window.open(url, "_blank", "noopener,noreferrer");
-  } catch (e) {
-    win = null;
-  }
-  if (!win) {
-    showLinkModal(url);
-  }
-}
-
-document.getElementById("linkCloseBtn").addEventListener("click", () => {
-  document.getElementById("linkOverlay").classList.add("hidden");
-});
-document.getElementById("linkCopyBtn").addEventListener("click", async () => {
-  const input = document.getElementById("linkUrlInput");
-  input.select();
-  let copied = false;
-  try {
-    await navigator.clipboard.writeText(input.value);
-    copied = true;
-  } catch (e) {
-    try {
-      copied = document.execCommand("copy");
-    } catch (e2) {
-      copied = false;
-    }
-  }
-  toast(copied ? "URLをコピーしました。" : "コピーできませんでした。手動で選択してコピーしてください。", !copied);
-});
-
-document.getElementById("changeNameBtn").addEventListener("click", async () => {
-  const name = await askText("表示名を入力", "編集ロック（誰が編集中かを表示するため）に使う名前です。担当者名などでOKです。", "例）髙橋", currentUser);
-  if (name) {
-    currentUser = name;
-    document.getElementById("whoamiName").textContent = currentUser;
-  }
-});
-
-document.getElementById("fChurn").addEventListener("change", updateChurnReasonVisibility);
-
-document.getElementById("fStaff").addEventListener("change", async (e) => {
-  if (e.target.value !== "__add__") return;
-  const prevValue = staffList[0] || "";
-  const name = await askText("メンバーを追加", "担当者リストに追加する名前を入力してください。", "例）山田", "");
-  if (name) {
-    await addStaffMember(name);
-    populateStaffFieldSelect(name);
-  } else {
-    populateStaffFieldSelect(prevValue);
-  }
-});
-
-document.getElementById("addStaffBtn").addEventListener("click", async () => {
-  const name = await askText("メンバーを追加", "担当者リストに追加する名前を入力してください。", "例）山田", "");
-  if (name) {
-    await addStaffMember(name);
-    render();
-  }
-});
-
-document.getElementById("pasteVisitBtn").addEventListener("click", openVisitPasteModal);
-
-function addMonthsToDateStr(dateStr, months) {
-  const d = parseFlexibleDate(dateStr);
-  if (!d) return null;
-  const nd = new Date(d.getFullYear(), d.getMonth() + months, d.getDate());
-  const yyyy = nd.getFullYear();
-  const mm = String(nd.getMonth() + 1).padStart(2, "0");
-  const dd = String(nd.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-document.getElementById("fRenewalDate").addEventListener("input", () => {
-  document.getElementById("fRenewalSent").checked = false;
-});
-
-function updateChurnReasonVisibility() {
-  const wrap = document.getElementById("churnReasonWrap");
-  const isChurnedNow = document.getElementById("fChurn").value === "削除";
-  wrap.classList.toggle("hidden", !isChurnedNow);
-}
-
-async function ensureUser() {
-  if (currentUser) return true;
-  const name = await askText("表示名を入力", "編集ロック（誰が編集中かを表示するため）に使う名前です。担当者名などでOKです。", "例）髙橋", "");
-  if (!name) return false;
-  currentUser = name;
-  document.getElementById("whoamiName").textContent = currentUser;
-  return true;
-}
-
-async function readLock() {
-  try {
-    const res = await window.storage.get(LOCK_KEY, true);
-    if (!res || !res.value) return null;
-    const lock = JSON.parse(res.value);
-    if (Date.now() - lock.ts > LOCK_TTL_MS) return null;
-    return lock;
-  } catch (e) {
-    return null;
-  }
-}
-
-async function acquireLock() {
-  const lock = await readLock();
-  if (lock && lock.sessionId !== sessionId) {
-    return { ok: false, holder: lock.user };
-  }
-  try {
-    await window.storage.set(LOCK_KEY, JSON.stringify({ user: currentUser, sessionId, ts: Date.now() }), true);
-    return { ok: true };
-  } catch (e) {
-    // If storage isn't reachable, fall back to allowing local editing
-    // rather than blocking the user entirely.
-    return { ok: true, warn: true };
-  }
-}
-
-async function releaseLock() {
-  try {
-    const lock = await readLock();
-    if (lock && lock.sessionId === sessionId) {
-      await window.storage.delete(LOCK_KEY, true);
-    }
-  } catch (e) { /* best effort */ }
-}
-
-async function loadCustomers() {
-  let needsResave = false;
-  try {
-    const res = await window.storage.get(STORAGE_KEY, true);
-    customers = res && res.value ? JSON.parse(res.value) : SEED.slice();
-  } catch (e) {
-    customers = SEED.slice();
-    needsResave = true;
-  }
-  // 土地ありのお客様はランディ対象外のためデータから除外する
-  const before = customers.length;
-  customers = customers.filter(c => c.land !== "有");
-  if (customers.length !== before) needsResave = true;
-
-  // 「初回来場」表記は「登録日」に統一し、削除理由欄がない古いデータを補完する
-  customers.forEach(c => {
-    if (c.note && c.note.includes("初回来場")) {
-      c.note = c.note.split("初回来場").join("登録日");
-      needsResave = true;
-    }
-    if (c.churnReason === undefined) {
-      c.churnReason = "";
-      needsResave = true;
-    }
-    if (c.lastActivity === undefined) {
-      c.lastActivity = "";
-      needsResave = true;
-    }
-    if (c.renewalDate === undefined) {
-      c.renewalDate = "";
-      needsResave = true;
-    }
-    if (c.renewalReminderSent === undefined) {
-      c.renewalReminderSent = false;
-      needsResave = true;
-    }
-    if (c.renewalReminderSentFor === undefined) {
-      c.renewalReminderSentFor = "";
-      needsResave = true;
-    }
-    if (c.randyUrl === undefined) {
-      c.randyUrl = "";
-      needsResave = true;
-    }
-    if (!c.surveySent) {
-      c.surveySent = { t1:false, t2:false, t3:false };
-      needsResave = true;
-    }
-  });
-
-  if (needsResave) {
-    try { await window.storage.set(STORAGE_KEY, JSON.stringify(customers), true); } catch (e2) { /* ignore */ }
-  }
-  renderBoardArea();
-  render();
-}
-
-async function saveCustomers() {
-  try {
-    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(customers), true);
-    if (!result) {
-      toast("保存に失敗しました。もう一度お試しください。", true);
-      return false;
-    }
-    return true;
-  } catch (e) {
-    toast("保存できませんでした：" + (e && e.message ? e.message : "原因不明のエラー"), true);
-    return false;
-  }
-}
-
-function renderBoardArea() {
-  document.getElementById("boardArea").innerHTML = `<div class="board" id="board"></div>`;
-}
-
-function isChurned(c) { return c.churn === "削除"; }
-function progressKey(c) {
-  // 過去データに "ST0"（文字列）と ""（空欄）の両方が混在しているため、
-  // どちらも STEP0 列として扱うための正規化
-  return c.progress === "ST0" ? "" : (c.progress || "");
-}
-
-function pctColor(pct) {
-  // 目標は80%。未達（79%以下）は赤、達成（80%以上）は緑。
-  return pct >= 80 ? "#2c7a44" : "#c0392b";
-}
-
-const STALL_TIER1_DAYS = 14;  // 2週間
-const STALL_TIER2_DAYS = 28;  // 4週間
-const STALL_TIER3_DAYS = 90;  // 3ヶ月
-
-function parseFlexibleDate(str) {
-  if (!str) return null;
-  const s = str.trim();
-  let m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-  if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
-  m = s.match(/^(\d{1,2})[\/\-](\d{1,2})$/);
-  if (m) {
-    const now = new Date();
-    return new Date(now.getFullYear(), +m[1] - 1, +m[2]);
-  }
-  const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-function toDateInputValue(str) {
-  // <input type="date"> は "YYYY-MM-DD" 形式でないと値が入らないため、
-  // 過去に "YYYY/MM/DD" 形式で保存されたデータもここで変換する
-  const d = parseFlexibleDate(str);
-  if (!d) return "";
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-function daysSince(str) {
-  const d = parseFlexibleDate(str);
-  if (!d) return null;
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  d.setHours(0,0,0,0);
-  return Math.round((today - d) / 86400000);
-}
-
-function stallTier(c) {
-  const days = daysSince(c.lastActivity);
-  if (days === null) return { tier: 0, days: null };
-  if (days >= STALL_TIER3_DAYS) return { tier: 3, days };
-  if (days >= STALL_TIER2_DAYS) return { tier: 2, days };
-  if (days >= STALL_TIER1_DAYS) return { tier: 1, days };
-  return { tier: 0, days };
-}
-
-function stallBadge(info) {
-  if (info.days === null) return "";
-  if (info.tier === 3) return `<span class="tag stall-tier3">${info.days}日 停滞中（3ヶ月アンケート③目安）</span>`;
-  if (info.tier === 2) return `<span class="tag stall-tier2">${info.days}日 停滞中（4週間アンケート②目安）</span>`;
-  if (info.tier === 1) return `<span class="tag stall-tier1">${info.days}日 停滞中（2週間アンケート①目安）</span>`;
-  return `<span class="tag stall-ok">${info.days}日前に活動</span>`;
-}
-
-const RENEWAL_PERIOD_DAYS = 90; // 3ヶ月ごとの更新
-const RENEWAL_REMINDER_LEAD_DAYS = 14; // 更新の2週間前から知らせる
-
-function renewalBadge(c) {
-  const days = daysSince(c.renewalDate);
-  if (days === null) return "";
-  if (days <= RENEWAL_PERIOD_DAYS) {
-    return `<span class="tag renew-ok">🔓 閲覧期限内（非公開物件 閲覧可）</span>`;
-  }
-  return `<span class="tag renew-bad">🔒 閲覧期限切れ（${days}日経過）</span>`;
-}
-
-function renewalReminderResolved(c) {
-  return !!(c.renewalReminderSent && c.renewalReminderSentFor === (c.renewalDate || ""));
-}
-
-function makeCard(c) {
-  const churned = isChurned(c);
-  const col = staffColor(c.staff);
-  const initial = c.staff ? c.staff.charAt(0) : "?";
-  const info = churned ? { tier: 0, days: null } : stallTier(c);
-  const sv = c.surveySent || {};
-  const tierKeyMap = { 1: "t1", 2: "t2", 3: "t3" };
-  const currentTierKey = tierKeyMap[info.tier];
-  const stallResolved = !currentTierKey || !!sv[currentTierKey];
-
-  const renewalDays = daysSince(c.renewalDate);
-  const renewalActive = renewalDays !== null && renewalDays >= (RENEWAL_PERIOD_DAYS - RENEWAL_REMINDER_LEAD_DAYS);
-  const renewalOverdue = renewalDays !== null && renewalDays >= RENEWAL_PERIOD_DAYS;
-  const renewalResolved = renewalReminderResolved(c);
-
-  // 色の優先度: 更新リマインドが未対応なら最優先、それ以外はアンケート停滞の色
-  let tintClass = "";
-  if (!churned && renewalActive && !renewalResolved) {
-    tintClass = renewalOverdue ? " renew-tint-bad" : " renew-tint-warn";
-  } else if (!churned && info.tier > 0 && !stallResolved) {
-    tintClass = ` tier${info.tier}`;
-  }
-
-  const linkHtml = c.randyUrl
-    ? `<button type="button" class="randy-link" data-url="${c.randyUrl.replace(/"/g, "&quot;")}" title="ランディで開く">🔗</button>`
-    : "";
-
-  const surveyHtml = (!churned && c.lastActivity) ? `<div class="card-survey">
-    ${[["t1","①2週間",STALL_TIER1_DAYS],["t2","②4週間",STALL_TIER2_DAYS],["t3","③3ヶ月",STALL_TIER3_DAYS]].map(([key,label,threshold]) => {
-      const reached = info.days !== null && info.days >= threshold;
-      return `<label class="${reached ? "" : "disabled"}" title="${reached ? "アンケート送信済みにする" : threshold + "日経過後にチェックできます"}">
-        <input type="checkbox" class="survey-check" data-id="${c.id}" data-tier="${key}" ${sv[key] ? "checked" : ""} ${reached ? "" : "disabled"}>${label}
-      </label>`;
-    }).join("")}
-  </div>` : "";
-
-  const renewalCheckHtml = (!churned && renewalActive) ? `<div class="card-renewal">
-    <label title="案内メールを送信済みにする">
-      <input type="checkbox" class="renewal-check" data-id="${c.id}" ${renewalResolved ? "checked" : ""}>📧 案内メール送信済み
-    </label>
-  </div>` : "";
-
-  return `<div class="card ${churned ? "churned" : ""}${tintClass}" data-id="${c.id}" style="--staff-color:${col.text}">
-    <div class="card-top">
-      <span class="avatar" style="background:${col.text}">${initial}</span>
-      <div class="name">${c.name || "(名前未入力)"}</div>
-      ${linkHtml}
-    </div>
+function makeCard(r, colKey) {
+  const churned = isChurned(r);
+  const note = cardNote(r, colKey);
+  return `<div class="card ${churned ? "churned" : ""}">
+    <div class="name">${r[IDX.name]}</div>
     <div class="meta">
-      ${c.staff ? `<span class="tag staff" style="background:${col.bg};color:${col.text}">${c.staff}</span>` : ""}
+      <span class="tag staff">${r[IDX.staff]}</span>
       ${churned ? '<span class="tag churn">削除</span>' : ""}
-      ${c.month ? `<span class="tag date">${c.month}</span>` : ""}
-      ${!churned ? renewalBadge(c) : ""}
-      ${!churned ? stallBadge(info) : ""}
+      ${r[IDX.month] ? `<span class="tag date">${r[IDX.month]}</span>` : ""}
     </div>
-    ${c.note ? `<div class="note">${c.note}</div>` : ""}
-    ${churned && c.churnReason ? `<div class="note churn-reason">理由: ${c.churnReason}</div>` : ""}
-    ${renewalCheckHtml}
-    ${surveyHtml}
+    ${note ? `<div class="note">${note}</div>` : ""}
   </div>`;
-
 }
 
-function currentList() {
+function currentRows() {
   const q = document.getElementById("searchBox").value.trim();
   const staff = document.getElementById("staffFilter").value;
   const showChurned = document.getElementById("showChurned").checked;
-  const stalledOnly = document.getElementById("showStalledOnly").checked;
-  return customers.filter(c => {
-    if (q && !(c.name || "").includes(q)) return false;
-    if (staff && c.staff !== staff) return false;
-    if (!showChurned && isChurned(c)) return false;
-    if (stalledOnly) {
-      if (isChurned(c)) return false;
-      const days = daysSince(c.lastActivity);
-      if (days === null || days < STALL_TIER1_DAYS) return false;
-    }
+  return ROWS.filter(r => {
+    if (q && !r[IDX.name].includes(q)) return false;
+    if (staff && r[IDX.staff] !== staff) return false;
+    if (!showChurned && isChurned(r)) return false;
     return true;
   });
 }
 
-function renderStaffLegend() {
-  const H1_MONTHS = [7, 8, 9, 10, 11, 12]; // 7〜12月
-  const stats = {};
-  customers.forEach(c => {
-    if (!c.staff) return;
-    if (!stats[c.staff]) {
-      stats[c.staff] = {
-        h1: { total: 0, registered: 0 }, // 7〜12月
-        h2: { total: 0, registered: 0 }, // 1〜6月
-        all: { total: 0, registered: 0 },
-      };
-    }
-    const s = stats[c.staff];
-    const registered = progressKey(c) !== "";
-    s.all.total++;
-    if (registered) s.all.registered++;
-
-    const m = (c.month || "").match(/^(\d{4})[\/\-](\d{1,2})/);
-    if (m) {
-      const mo = parseInt(m[2], 10);
-      const bucket = H1_MONTHS.includes(mo) ? s.h1 : s.h2;
-      bucket.total++;
-      if (registered) bucket.registered++;
-    }
-  });
-
-  const pctOf = (obj) => obj.total > 0 ? Math.round((obj.registered / obj.total) * 100) : null;
-  const cell = (obj) => {
-    const p = pctOf(obj);
-    return p === null
-      ? `<span class="sr-col na">―</span>`
-      : `<span class="sr-col">${p}%</span>`;
-  };
-
-  const legend = document.getElementById("staffLegend");
-  const names = Object.keys(stats).sort((a, b) => a.localeCompare(b, "ja"));
-  if (!names.length) { legend.innerHTML = ""; return; }
-
-  legend.innerHTML = `
-    <div class="staff-rate-row staff-rate-head">
-      <span class="sr-name">担当　登録率</span>
-      <span class="sr-col">7〜12月</span>
-      <span class="sr-col">1〜6月</span>
-      <span class="sr-col">全体</span>
-    </div>
-    ${names.map(name => {
-      const col = staffColor(name);
-      const s = stats[name];
-      return `<div class="staff-rate-row">
-        <span class="sr-name" style="color:${col.text}"><span class="dot" style="background:${col.text}"></span>${name}</span>
-        ${cell(s.h1)}
-        ${cell(s.h2)}
-        ${cell(s.all)}
-      </div>`;
-    }).join("")}
-  `;
-}
-
 function render() {
-  const list = currentList();
-  assignStaffColors();
+  const rows = currentRows();
+  const activeRows = rows.filter(r => !ownsLand(r));
+  const landRows = rows.filter(r => ownsLand(r));
 
-  // 「ランディ登録」= STEP0（来場・検討開始）を超えて、実際にステップが進んでいる状態
-  const isRegistered = c => progressKey(c) !== "";
-
-  const regTotal = list.length;
-  const regDone = list.filter(isRegistered).length;
-  const regPct = regTotal > 0 ? Math.round((regDone / regTotal) * 100) : 0;
-  const regColor = pctColor(regPct);
-  document.getElementById("regStat").innerHTML = `
-    土地なし客のランディ登録率　
-    <b style="color:${regColor}">${regPct}%</b>
-    <span class="bar"><span class="bar-fill" style="width:${regPct}%;background:${regColor}"></span></span>
-    （登録済み ${regDone} / ${regTotal} 件）
-  `;
-
-  // 月別の内訳
-  const monthMap = {};
-  list.forEach(c => {
-    const m = (c.month || "").match(/^(\d{4})[\/\-](\d{1,2})/);
-    const label = m ? `${m[1]}/${m[2].padStart(2, "0")}` : "月不明";
-    if (!monthMap[label]) monthMap[label] = { total: 0, registered: 0 };
-    monthMap[label].total++;
-    if (isRegistered(c)) monthMap[label].registered++;
-  });
-  const monthLabels = Object.keys(monthMap).sort();
-  document.getElementById("monthlyRegTable").innerHTML = monthLabels.length
-    ? monthLabels.map(label => {
-        const { total, registered } = monthMap[label];
-        const pct = total > 0 ? Math.round((registered / total) * 100) : 0;
-        const color = pctColor(pct);
-        return `<div class="monthly-reg-row">
-          <span class="m-label">${label}</span>
-          <span class="m-bar"><span class="m-bar-fill" style="width:${pct}%;background:${color}"></span></span>
-          <span class="m-pct" style="color:${color}">${pct}%</span>
-          <span class="m-count">（${registered} / ${total} 件）</span>
-        </div>`;
-      }).join("")
-    : `<div class="empty-col">該当するデータがありません</div>`;
-
-  // 期別の内訳（7月始まり〜翌6月終わり、2025/07開始=48期を基準に計算）
-  const FISCAL_ANCHOR_START_YEAR = 2025;
-  const FISCAL_ANCHOR_TERM = 48;
-  const fiscalMap = {};
-  list.forEach(c => {
-    const m = (c.month || "").match(/^(\d{4})[\/\-](\d{1,2})/);
-    let startYear = null;
-    if (m) {
-      const y = parseInt(m[1], 10);
-      const mo = parseInt(m[2], 10);
-      startYear = mo >= 7 ? y : y - 1;
-    }
-    const key = startYear !== null ? String(startYear) : "unknown";
-    if (!fiscalMap[key]) fiscalMap[key] = { total: 0, registered: 0, startYear };
-    fiscalMap[key].total++;
-    if (isRegistered(c)) fiscalMap[key].registered++;
-  });
-  const fiscalKeys = Object.keys(fiscalMap).sort();
-  document.getElementById("fiscalRegTable").innerHTML = fiscalKeys.length
-    ? fiscalKeys.map(key => {
-        const { total, registered, startYear } = fiscalMap[key];
-        const pct = total > 0 ? Math.round((registered / total) * 100) : 0;
-        const color = pctColor(pct);
-        const term = startYear !== null ? FISCAL_ANCHOR_TERM + (startYear - FISCAL_ANCHOR_START_YEAR) : null;
-        const label = startYear !== null
-          ? `${term}期（${startYear}/07〜${startYear + 1}/06）`
-          : "時期不明";
-        return `<div class="monthly-reg-row">
-          <span class="m-label" style="width:180px;">${label}</span>
-          <span class="m-bar"><span class="m-bar-fill" style="width:${pct}%;background:${color}"></span></span>
-          <span class="m-pct" style="color:${color}">${pct}%</span>
-          <span class="m-count">（${registered} / ${total} 件）</span>
-        </div>`;
-      }).join("")
-    : `<div class="empty-col">該当するデータがありません</div>`;
-
+  // flow bar counts
   const flowBar = document.getElementById("flowBar");
-  flowBar.innerHTML = COLUMNS.map(col => {
-    const cnt = list.filter(c => progressKey(c) === col.key).length;
-    return `<div class="flow-seg" style="background:${col.accent}">
-      <span class="lbl">${col.tag}</span>
+  flowBar.innerHTML = COLUMNS.map(c => {
+    const cnt = activeRows.filter(r => r[IDX.progress] === c.key).length;
+    return `<div class="flow-seg" style="background:${c.accent}">
+      <span class="lbl">${c.tag}</span>
       <span class="n">${cnt}</span>
-      <span class="lbl">${col.name}</span>
+      <span class="lbl">${c.name}</span>
     </div>`;
   }).join("");
 
+  // board
   const board = document.getElementById("board");
-  if (board) {
-    board.innerHTML = COLUMNS.map(col => {
-      const items = list.filter(c => progressKey(c) === col.key)
-        .slice()
-        .sort((a, b) => {
-          const ca = isChurned(a) ? 1 : 0;
-          const cb = isChurned(b) ? 1 : 0;
-          if (ca !== cb) return ca - cb;
-          return (a.staff || "").localeCompare(b.staff || "", "ja");
-        });
-      const body = items.length ? items.map(makeCard).join("") : `<div class="empty-col">該当なし</div>`;
-      return `<div class="column" style="--col-accent:${col.accent}; --col-tint:${col.tint}">
-        <div class="column-head">
-          <div class="step-tag">${col.tag}</div>
-          <div class="step-name">${col.name}</div>
-          <div class="step-count">${items.length} 件</div>
-        </div>
-        <div class="cards">${body}</div>
-      </div>`;
-    }).join("");
+  board.innerHTML = COLUMNS.map(c => {
+    const items = activeRows.filter(r => r[IDX.progress] === c.key);
+    const body = items.length
+      ? items.map(r => makeCard(r, c.key)).join("")
+      : `<div class="empty-col">該当なし</div>`;
+    return `<div class="column" style="--col-accent:${c.accent}; --col-tint:${c.tint}">
+      <div class="column-head">
+        <div class="step-tag">${c.tag}</div>
+        <div class="step-name">${c.name}</div>
+        <div class="step-count">${items.length} 件</div>
+      </div>
+      <div class="cards">${body}</div>
+    </div>`;
+  }).join("");
 
-    board.querySelectorAll(".card").forEach(el => {
-      el.addEventListener("click", () => openModal(el.dataset.id));
-    });
-    board.querySelectorAll(".randy-link").forEach(el => {
-      el.addEventListener("click", (e) => {
-        e.stopPropagation();
-        openRandyLink(el.dataset.url);
-      });
-    });
-    board.querySelectorAll(".survey-check").forEach(el => {
-      el.addEventListener("click", (e) => e.stopPropagation());
-      el.addEventListener("change", async (e) => {
-        e.stopPropagation();
-        await toggleSurveySent(el.dataset.id, el.dataset.tier, el.checked);
-      });
-    });
-    board.querySelectorAll(".renewal-check").forEach(el => {
-      el.addEventListener("click", (e) => e.stopPropagation());
-      el.addEventListener("change", async (e) => {
-        e.stopPropagation();
-        await toggleRenewalSent(el.dataset.id, el.checked);
-      });
-    });
-  }
+  // land-owned side note
+  document.getElementById("landOwnedSummary").textContent =
+    `すでに土地あり・ランディ対象外のお客様（${landRows.length} 件）`;
+  document.getElementById("landOwnedCards").innerHTML =
+    landRows.map(r => makeCard(r, "")).join("") || `<div class="empty-col">該当なし</div>`;
 
-  document.getElementById("totalCount").textContent = `表示中 ${list.length} / 全 ${customers.length} 件`;
-  populateStaffSelect();
-  renderStaffLegend();
+  document.getElementById("totalCount").textContent =
+    `表示中 ${rows.length} / 全 ${ROWS.length} 件`;
 }
 
 function populateStaffSelect() {
+  const set = new Set();
+  ROWS.forEach(r => { if (r[IDX.staff]) set.add(r[IDX.staff]); });
   const sel = document.getElementById("staffFilter");
-  const current = sel.value;
-  const set = new Set(staffList);
-  customers.forEach(c => { if (c.staff) set.add(c.staff); });
-  sel.innerHTML = '<option value="">担当：すべて</option>' + Array.from(set).sort((a,b)=>a.localeCompare(b,"ja")).map(v => `<option value="${v}">${v}</option>`).join("");
-  sel.value = current;
+  Array.from(set).sort().forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = v;
+    sel.appendChild(opt);
+  });
 }
-
-async function openModal(id) {
-  const ok = await ensureUser();
-  if (!ok) return;
-  const lockResult = await acquireLock();
-  if (!lockResult.ok) {
-    toast(`現在「${lockResult.holder}」さんが編集中です。しばらくしてからもう一度お試しください。`, true);
-    return;
-  }
-  const overlay = document.getElementById("overlay");
-  const isNew = !id;
-  document.getElementById("modalTitle").textContent = isNew ? "お客様を追加" : "お客様情報を編集";
-  document.getElementById("deleteBtn").classList.toggle("hidden", isNew);
-  const c = isNew ? { id: "", name:"", staff:"", month:"", progress:"", churn:"継続", note:"", churnReason:"", lastActivity:"", renewalDate:"", renewalReminderSent:false, renewalReminderSentFor:"", randyUrl:"", surveySent:{t1:false,t2:false,t3:false} }
-                  : customers.find(x => x.id === id);
-  document.getElementById("editId").value = c.id || "";
-  document.getElementById("fName").value = c.name || "";
-  populateStaffFieldSelect(c.staff || "");
-  document.getElementById("fMonth").value = c.month || "";
-  document.getElementById("fProgress").value = c.progress || "";
-  document.getElementById("fChurn").value = c.churn || "継続";
-  document.getElementById("fChurnReason").value = c.churnReason || "";
-  updateChurnReasonVisibility();
-  document.getElementById("fLastActivity").value = toDateInputValue(c.lastActivity);
-  document.getElementById("fRenewalDate").value = toDateInputValue(c.renewalDate);
-  document.getElementById("fRenewalSent").checked = renewalReminderResolved(c);
-  document.getElementById("fRandyUrl").value = c.randyUrl || "";
-  const sv = c.surveySent || {};
-  document.getElementById("fSurvey1").checked = !!sv.t1;
-  document.getElementById("fSurvey2").checked = !!sv.t2;
-  document.getElementById("fSurvey3").checked = !!sv.t3;
-  document.getElementById("fNote").value = c.note || "";
-  const lockNote = document.getElementById("lockNote");
-  lockNote.textContent = lockResult.warn
-    ? "共有ストレージに接続できないため、この編集はこの画面だけに一時保存されます。"
-    : `編集中：${currentUser}（保存または閉じるまで他の人は編集できません）`;
-  lockNote.classList.add("show");
-  overlay.classList.remove("hidden");
-}
-
-async function closeModal() {
-  document.getElementById("overlay").classList.add("hidden");
-  await releaseLock();
-}
-
-async function handleSave() {
-  const id = document.getElementById("editId").value;
-  const record = {
-    id: id || uid(),
-    name: document.getElementById("fName").value.trim(),
-    staff: document.getElementById("fStaff").value.trim(),
-    month: document.getElementById("fMonth").value.trim(),
-    progress: document.getElementById("fProgress").value,
-    land: "無",
-    churn: document.getElementById("fChurn").value,
-    note: document.getElementById("fNote").value.trim(),
-    lastActivity: document.getElementById("fLastActivity").value.trim(),
-    renewalDate: document.getElementById("fRenewalDate").value.trim(),
-    randyUrl: document.getElementById("fRandyUrl").value.trim(),
-    surveySent: {
-      t1: document.getElementById("fSurvey1").checked,
-      t2: document.getElementById("fSurvey2").checked,
-      t3: document.getElementById("fSurvey3").checked,
-    },
-  };
-  const renewalSentChecked = document.getElementById("fRenewalSent").checked;
-  record.renewalReminderSent = renewalSentChecked;
-  record.renewalReminderSentFor = renewalSentChecked ? record.renewalDate : "";
-  record.churnReason = document.getElementById("fChurnReason").value.trim();
-  if (!record.name) { toast("お客様名を入力してください。", true); return; }
-  if (record.staff === "__add__" || !record.staff) { toast("担当を選択してください。", true); return; }
-  const prevProgress = id ? (customers.find(c => c.id === id)?.progress || "") : "";
-  if (id) {
-    const idx = customers.findIndex(c => c.id === id);
-    if (idx >= 0) customers[idx] = record;
-  } else {
-    customers.push(record);
-  }
-  const ok = await saveCustomers();
-  await closeModal();
-  render();
-  if (ok) {
-    toast("保存しました。");
-    // ==== STEP5到達サプライズの発火（不要ならこの3行を削除でOK） ====
-    if (record.progress === "ST5" && prevProgress !== "ST5") {
-      celebrateStep5(record.name);
-    }
-  }
-}
-
-async function toggleSurveySent(id, tierKey, checked) {
-  const c = customers.find(x => x.id === id);
-  if (!c) return;
-  if (!c.surveySent) c.surveySent = { t1:false, t2:false, t3:false };
-  c.surveySent[tierKey] = checked;
-  const ok = await saveCustomers();
-  render();
-  if (ok) toast(checked ? "送信済みにしました。" : "未送信に戻しました。");
-}
-
-async function toggleRenewalSent(id, checked) {
-  const c = customers.find(x => x.id === id);
-  if (!c) return;
-  c.renewalReminderSent = checked;
-  c.renewalReminderSentFor = checked ? (c.renewalDate || "") : "";
-  const ok = await saveCustomers();
-  render();
-  if (ok) toast(checked ? "案内メール送信済みにしました。" : "未送信に戻しました。");
-}
-
-async function handleDelete() {
-  const id = document.getElementById("editId").value;
-  if (!id) return;
-  const ok = await askConfirm("削除の確認", "このお客様を削除します。よろしいですか？");
-  if (!ok) return;
-  customers = customers.filter(c => c.id !== id);
-  const saved = await saveCustomers();
-  await closeModal();
-  render();
-  if (saved) toast("削除しました。");
-}
-
-/* ==== データのバックアップ書き出し・読み込み（公開し直してもデータを守るための保険） ==== */
-function exportBackup() {
-  const payload = {
-    exportedAt: new Date().toISOString(),
-    customers: customers,
-    staffList: staffList,
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  const d = new Date();
-  const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
-  a.href = url;
-  a.download = `ランディステップトラッカー_バックアップ_${stamp}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast("バックアップを書き出しました。");
-}
-
-async function importBackupFromFile(file) {
-  let text = "";
-  try {
-    text = await file.text();
-  } catch (e) {
-    toast("ファイルを読み込めませんでした。", true);
-    return;
-  }
-  let data = null;
-  try {
-    data = JSON.parse(text);
-  } catch (e) {
-    toast("正しいバックアップファイルではありませんでした。", true);
-    return;
-  }
-  if (!data || !Array.isArray(data.customers)) {
-    toast("正しいバックアップファイルではありませんでした。", true);
-    return;
-  }
-  const ok = await askConfirm(
-    "データの復元",
-    `このバックアップ（${data.customers.length}件のお客様データ）で、今の内容を上書きします。よろしいですか？`
-  );
-  if (!ok) return;
-
-  customers = data.customers;
-  if (Array.isArray(data.staffList) && data.staffList.length) {
-    staffList = data.staffList;
-    await saveStaffList();
-  }
-  const saveOk = await saveCustomers();
-  render();
-  if (saveOk) toast("バックアップからデータを復元しました。");
-}
-
-document.getElementById("exportBackupBtn").addEventListener("click", exportBackup);
-document.getElementById("importBackupBtn").addEventListener("click", () => {
-  document.getElementById("importBackupFile").click();
-});
-document.getElementById("importBackupFile").addEventListener("change", async (e) => {
-  const file = e.target.files && e.target.files[0];
-  if (file) await importBackupFromFile(file);
-  e.target.value = "";
-});
-/* ==== ここまで ==== */
-
-document.getElementById("addBtn").addEventListener("click", () => openModal(null));
-document.getElementById("cancelBtn").addEventListener("click", closeModal);
-document.getElementById("saveBtn").addEventListener("click", handleSave);
-document.getElementById("deleteBtn").addEventListener("click", handleDelete);
-document.getElementById("overlay").addEventListener("click", (e) => { if (e.target.id === "overlay") closeModal(); });
 
 document.getElementById("searchBox").addEventListener("input", render);
 document.getElementById("staffFilter").addEventListener("change", render);
 document.getElementById("showChurned").addEventListener("change", render);
-document.getElementById("showStalledOnly").addEventListener("change", render);
 document.getElementById("resetBtn").addEventListener("click", () => {
   document.getElementById("searchBox").value = "";
   document.getElementById("staffFilter").value = "";
   document.getElementById("showChurned").checked = false;
-  document.getElementById("showStalledOnly").checked = false;
   render();
 });
-document.getElementById("refreshBtn").addEventListener("click", async () => {
-  await loadStaffList();
-  await loadCustomers();
-});
 
-window.addEventListener("error", (e) => {
-  console.error("Uncaught error:", e.error || e.message);
-});
-
-/* ==== 外部ツールからの引き継ぎ登録（不要ならこのブロックと呼び出しボタンを削除でOK） ====
-   来場アンケート管理側で「ランディへ」ボタンを押すと、お客様情報がクリップボードにコピーされます。
-   ここではその内容を読み取って、お客様追加モーダルに自動入力します（STEP0のまま）。 */
-function openVisitPasteModal() {
-  document.getElementById("visitPasteInput").value = "";
-  document.getElementById("visitPasteOverlay").classList.remove("hidden");
-  document.getElementById("visitPasteInput").focus();
-}
-function closeVisitPasteModal() {
-  document.getElementById("visitPasteOverlay").classList.add("hidden");
-}
-
-async function handleVisitPasteSubmit() {
-  const text = document.getElementById("visitPasteInput").value.trim();
-  if (!text) {
-    toast("テキストが入力されていません。", true);
-    return;
-  }
-  let data = null;
-  try {
-    const parsed = JSON.parse(text);
-    if (parsed && parsed.source === "randy-handoff") data = parsed;
-  } catch (e) {
-    data = null;
-  }
-  if (!data) {
-    toast("正しい形式のデータではありませんでした。来場アンケート管理からコピーした内容をそのまま貼り付けてください。", true);
-    return;
-  }
-  closeVisitPasteModal();
-  await openModal(null);
-  if (data.name) document.getElementById("fName").value = data.name;
-  if (data.month) document.getElementById("fMonth").value = data.month;
-  if (data.staff) populateStaffFieldSelect(data.staff);
-  toast(data.staff
-    ? "来場アンケート管理から情報（担当含む）を引き継ぎました。内容を確認して保存してください。"
-    : "来場アンケート管理から情報を引き継ぎました。担当を選んで保存してください。");
-}
-
-document.getElementById("visitPasteCancelBtn").addEventListener("click", closeVisitPasteModal);
-document.getElementById("visitPasteOkBtn").addEventListener("click", handleVisitPasteSubmit);
-document.getElementById("visitPasteOverlay").addEventListener("click", (e) => {
-  if (e.target.id === "visitPasteOverlay") closeVisitPasteModal();
-});
-/* ==== ここまで ==== */
-
-(async () => {
-  await loadStaffList();
-  await loadCustomers();
-})();
+populateStaffSelect();
+render();
 </script>
 </body>
 </html>
