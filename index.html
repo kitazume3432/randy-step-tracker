@@ -258,11 +258,11 @@
 
   <div class="reg-stat" id="regStat"></div>
   <details class="side-note" id="monthlyRegDetails" style="margin-bottom:14px;margin-top:0;">
-    <summary>月別のランディ登録率を見る</summary>
+    <summary>月別のランディ登録率を見る（削除済みも含む）</summary>
     <div id="monthlyRegTable" class="monthly-reg-table"></div>
   </details>
   <details class="side-note" id="fiscalRegDetails" style="margin-bottom:14px;margin-top:0;">
-    <summary>期別（7月始まり〜翌6月終わり）のランディ登録率を見る</summary>
+    <summary>期別（7月始まり〜翌6月終わり）のランディ登録率を見る（削除済みも含む）</summary>
     <div id="fiscalRegTable" class="monthly-reg-table"></div>
   </details>
 
@@ -277,6 +277,7 @@
     <label class="chk"><input type="checkbox" id="showChurned"> 削除・解約客も表示</label>
     <label class="chk"><input type="checkbox" id="showStalledOnly"> 停滞中のみ表示（14日以上動きなし）</label>
     <button class="ghost" id="addStaffBtn">＋ メンバー追加</button>
+    <button class="ghost" id="removeStaffBtn">－ メンバー削除</button>
     <button class="ghost" id="pasteVisitBtn">📋 来場データを貼り付けて登録</button>
     <button class="ghost" id="refreshBtn">最新の状態に更新</button>
     <button class="ghost" id="resetBtn">絞り込みをリセット</button>
@@ -365,7 +366,8 @@
   <div class="modal small">
     <h2 id="nameOverlayTitle">表示名を入力</h2>
     <p class="desc" id="nameOverlayDesc">編集ロック（誰が編集中かを表示するため）に使う名前です。担当者名などでOKです。</p>
-    <input type="text" id="nameInput" placeholder="例）髙橋">
+    <input type="text" id="nameInput" placeholder="例）髙橋" list="nameInputSuggest">
+    <datalist id="nameInputSuggest"></datalist>
     <div class="modal-actions center">
       <button class="btn-plain" id="nameCancelBtn">キャンセル</button>
       <button class="btn-primary" id="nameOkBtn">決定</button>
@@ -542,6 +544,18 @@ async function addStaffMember(name) {
   staffList.push(name);
   await saveStaffList();
   toast(`「${name}」を追加しました。`);
+  return true;
+}
+
+async function removeStaffMember(name) {
+  if (!name) return false;
+  if (!staffList.includes(name)) {
+    toast(`「${name}」は担当リストに見つかりませんでした。`, true);
+    return false;
+  }
+  staffList = staffList.filter(n => n !== name);
+  await saveStaffList();
+  toast(`「${name}」を担当リストから削除しました。`);
   return true;
 }
 
@@ -752,6 +766,36 @@ document.getElementById("addStaffBtn").addEventListener("click", async () => {
     await addStaffMember(name);
     render();
   }
+});
+
+document.getElementById("removeStaffBtn").addEventListener("click", async () => {
+  if (!staffList.length) {
+    toast("削除できる担当がいません。", true);
+    return;
+  }
+  const datalist = document.getElementById("nameInputSuggest");
+  datalist.innerHTML = staffList.slice().sort((a, b) => a.localeCompare(b, "ja"))
+    .map(n => `<option value="${n}">`).join("");
+  const name = await askText(
+    "メンバーを削除",
+    "担当リストから削除する名前を入力してください（既存のお客様データに登録されている担当名はそのまま残ります）。",
+    "例）山田",
+    ""
+  );
+  datalist.innerHTML = "";
+  if (!name) return;
+  if (!staffList.includes(name)) {
+    toast(`「${name}」は担当リストに見つかりませんでした。一覧の候補から選んでください。`, true);
+    return;
+  }
+  const inUseCount = customers.filter(c => c.staff === name).length;
+  const msg = inUseCount > 0
+    ? `「${name}」を担当リストから削除します。現在${inUseCount}件のお客様データに登録されていますが、それらのデータはそのまま残ります。よろしいですか？`
+    : `「${name}」を担当リストから削除します。よろしいですか？`;
+  const ok = await askConfirm("削除の確認", msg);
+  if (!ok) return;
+  await removeStaffMember(name);
+  render();
 });
 
 document.getElementById("pasteVisitBtn").addEventListener("click", openVisitPasteModal);
@@ -990,24 +1034,25 @@ function renewalReminderResolved(c) {
 
 function makeCard(c) {
   const churned = isChurned(c);
+  const inPlan = c.progress === "ST5"; // プラン入り以降はアンケート・更新期限の反応をしない
   const col = staffColor(c.staff);
   const initial = c.staff ? c.staff.charAt(0) : "?";
-  const info = churned ? { tier: 0, days: null } : stallTier(c);
+  const info = (churned || inPlan) ? { tier: 0, days: null } : stallTier(c);
   const sv = c.surveySent || {};
   const tierKeyMap = { 1: "t1", 2: "t2", 3: "t3" };
   const currentTierKey = tierKeyMap[info.tier];
   const stallResolved = !currentTierKey || !!sv[currentTierKey];
 
   const renewalDaysLeft = daysUntil(c.renewalDate);
-  const renewalActive = renewalDaysLeft !== null && renewalDaysLeft <= RENEWAL_REMINDER_LEAD_DAYS;
+  const renewalActive = !inPlan && renewalDaysLeft !== null && renewalDaysLeft <= RENEWAL_REMINDER_LEAD_DAYS;
   const renewalOverdue = renewalDaysLeft !== null && renewalDaysLeft < 0;
   const renewalResolved = renewalReminderResolved(c);
 
   // 色の優先度: 更新リマインドが未対応なら最優先、それ以外はアンケート停滞の色
   let tintClass = "";
-  if (!churned && renewalActive && !renewalResolved) {
+  if (!churned && !inPlan && renewalActive && !renewalResolved) {
     tintClass = renewalOverdue ? " renew-tint-bad" : " renew-tint-warn";
-  } else if (!churned && info.tier > 0 && !stallResolved) {
+  } else if (!churned && !inPlan && info.tier > 0 && !stallResolved) {
     tintClass = ` tier${info.tier}`;
   }
 
@@ -1015,7 +1060,7 @@ function makeCard(c) {
     ? `<button type="button" class="randy-link" data-url="${c.randyUrl.replace(/"/g, "&quot;")}" title="ランディで開く">🔗</button>`
     : "";
 
-  const surveyHtml = (!churned && c.lastActivity) ? `<div class="card-survey">
+  const surveyHtml = (!churned && !inPlan && c.lastActivity) ? `<div class="card-survey">
     ${[["t1","①2週間",STALL_TIER1_DAYS],["t2","②4週間",STALL_TIER2_DAYS],["t3","③3ヶ月",STALL_TIER3_DAYS]].map(([key,label,threshold]) => {
       const reached = info.days !== null && info.days >= threshold;
       return `<label class="${reached ? "" : "disabled"}" title="${reached ? "アンケート送信済みにする" : threshold + "日経過後にチェックできます"}">
@@ -1024,7 +1069,7 @@ function makeCard(c) {
     }).join("")}
   </div>` : "";
 
-  const renewalCheckHtml = (!churned && renewalActive) ? `<div class="card-renewal">
+  const renewalCheckHtml = (!churned && !inPlan && renewalActive) ? `<div class="card-renewal">
     <label title="案内メールを送信済みにする">
       <input type="checkbox" class="renewal-check" data-id="${c.id}" ${renewalResolved ? "checked" : ""}>📧 案内メール送信済み
     </label>
@@ -1040,8 +1085,8 @@ function makeCard(c) {
       ${c.staff ? `<span class="tag staff" style="background:${col.bg};color:${col.text}">${c.staff}</span>` : ""}
       ${churned ? '<span class="tag churn">削除</span>' : ""}
       ${c.month ? `<span class="tag date">${c.month}</span>` : ""}
-      ${!churned ? renewalBadge(c) : ""}
-      ${!churned ? stallBadge(info) : ""}
+      ${!churned && !inPlan ? renewalBadge(c) : ""}
+      ${!churned && !inPlan ? stallBadge(info) : ""}
     </div>
     ${c.note ? `<div class="note">${c.note}</div>` : ""}
     ${churned && c.churnReason ? `<div class="note churn-reason">理由: ${c.churnReason}</div>` : ""}
@@ -1065,6 +1110,18 @@ function currentList() {
       const days = daysSince(c.lastActivity);
       if (days === null || days < STALL_TIER1_DAYS) return false;
     }
+    return true;
+  });
+}
+
+// 月別・期別の登録率集計用：検索・担当の絞り込みは反映するが、
+// 「削除・解約客も表示」チェックの有無に関わらず、削除済みのお客様も集計に含める
+function listForAggregates() {
+  const q = document.getElementById("searchBox").value.trim();
+  const staff = document.getElementById("staffFilter").value;
+  return customers.filter(c => {
+    if (q && !(c.name || "").includes(q)) return false;
+    if (staff && c.staff !== staff) return false;
     return true;
   });
 }
@@ -1145,9 +1202,10 @@ function render() {
     （登録済み ${regDone} / ${regTotal} 件）
   `;
 
-  // 月別の内訳
+  // 月別の内訳（削除済みのお客様も含めて集計）
+  const aggList = listForAggregates();
   const monthMap = {};
-  list.forEach(c => {
+  aggList.forEach(c => {
     const m = (c.month || "").match(/^(\d{4})[\/\-](\d{1,2})/);
     const label = m ? `${m[1]}/${m[2].padStart(2, "0")}` : "月不明";
     if (!monthMap[label]) monthMap[label] = { total: 0, registered: 0 };
@@ -1173,7 +1231,7 @@ function render() {
   const FISCAL_ANCHOR_START_YEAR = 2025;
   const FISCAL_ANCHOR_TERM = 48;
   const fiscalMap = {};
-  list.forEach(c => {
+  aggList.forEach(c => {
     const m = (c.month || "").match(/^(\d{4})[\/\-](\d{1,2})/);
     let startYear = null;
     if (m) {
