@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>申込・契約 記録板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-page: #FBF7ED;
+    --navy-deep: #ECE0C4;
+    --navy-panel: #F3ECDC;
+    --navy-panel-2: #E6D8B4;
+    --grid-line: rgba(80,66,40,0.055);
+    --ink-light: #2B3540;
+    --ink-muted: #8C806B;
+    --paper: #FFFFFF;
+    --paper-2: #F1EADC;
+    --ink-dark: #2B3540;
+    --ink-dark-muted: #6B7880;
+    --stamp: #A63F30;
+    --stamp-dim: #8A362A;
+    --c-randy: #3D739C;
+    --c-fudousan: #4C8566;
+    --c-tochinashi: #C0954A;
+    --c-tochiari: #86597D;
+    --c-fumei: #7C8790;
+    --radius-s: 4px;
+    --radius-m: 8px;
+    --font-jp: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic Medium", "Yu Gothic", Meiryo, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid-line) 0, var(--grid-line) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0, var(--grid-line) 1px, transparent 1px, transparent 28px);
+    color: var(--ink-dark);
+    font-family: var(--font-jp);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .app { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  .app-header {
+    padding: 22px 28px 26px;
+    margin-bottom: 30px;
+    position: relative;
+    background: var(--navy-panel);
+    border-radius: var(--radius-m);
+    box-shadow: 0 3px 14px rgba(43,53,64,0.14);
+  }
+  .app-header::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--stamp) 0, var(--stamp) 48px, rgba(43,53,64,0.12) 48px);
+  }
+  .app-header h1 {
+    font-family: var(--font-jp);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0 0 8px;
+    color: var(--ink-light);
+  }
+  .app-header .subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+  .app-header .scale-note {
+    font-family: var(--font-jp);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    opacity: 0.75;
+    margin-top: 8px;
+  }
+
+  .save-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-family: var(--font-jp);
+    font-size: 0.72rem;
+    font-weight: 600;
+    border: 1px solid rgba(43,53,64,0.14);
+    background: rgba(43,53,64,0.05);
+    color: var(--ink-muted);
+    cursor: default;
+  }
+  .save-status::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink-muted);
+    flex-shrink: 0;
+  }
+  .save-status.saving::before { background: var(--c-tochinashi); }
+  .save-status.saved { color: var(--c-fudousan); border-color: rgba(76,133,102,0.3); background: rgba(76,133,102,0.08); }
+  .save-status.saved::before { background: var(--c-fudousan); }
+  .save-status.error {
+    color: var(--stamp-dim);
+    border-color: rgba(166,63,48,0.35);
+    background: rgba(166,63,48,0.08);
+    cursor: pointer;
+  }
+  .save-status.error::before { background: var(--stamp); }
+
+  .load-error {
+    display: none;
+    background: rgba(166,63,48,0.09);
+    border: 1px solid rgba(166,63,48,0.32);
+    border-radius: var(--radius-s);
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .load-error.show { display: block; }
+  .load-error p {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    color: var(--stamp-dim);
+    line-height: 1.6;
+  }
+  .load-error button {
+    background: var(--stamp);
+    color: #FFF6F3;
+    border: none;
+    padding: 7px 12px;
+    border-radius: var(--radius-s);
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-jp);
+  }
+  .load-error button:hover { background: var(--stamp-dim); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* ---- Entry panel ---- */
+  .entry-panel {
+    background: var(--navy-panel);
+    border: 1px solid rgba(43,53,64,0.08);
+    border-radius: var(--radius-m);
+    padding: 18px;
+    position: sticky;
+    top: 20px;
+    box-shadow: 0 3px 14px rgba(43,53,64,0.1);
+  }
+
+  .tab-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: var(--navy-deep);
+    padding: 5px;
+    border-radius: var(--radius-m);
+    margin-bottom: 18px;
+  }
+  .tab-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 0.86rem;
+    font-weight: 600;
+    padding: 10px 8px;
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tab-btn.active {
+    background: var(--navy-panel-2);
+    color: var(--ink-light);
+    box-shadow: inset 0 0 0 1px rgba(43,53,64,0.12);
+  }
+
+  .month-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(43,53,64,0.1);
+  }
+  .month-field label {
+    font-size: 0.76rem;
+    color: var(--ink-muted);
+  }
+  .month-field input[type="month"] {
+    background: var(--navy-panel-2);
+    border: 1px solid rgba(43,53,64,0.15);
+    color: var(--ink-light);
+    padding: 9px 10px;
+    border-radius: var(--radius-s);
+    font-family: var(--font-jp);
+    font-size: 0.85rem;
+    color-scheme: light;
+  }
+  .month-shortcuts { display: flex; gap: 8px; }
+  .month-shortcut {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(43,53,64,0.15);
+    color: var(--ink-muted);
+    font-size: 0.74rem;
+    padding: 6px 8px;
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .month-shortcut:hover { background: var(--navy-panel-2); color: var(--ink-light); }
+  .month-shortcut.active { background: var(--navy-panel-2); color: var(--ink-light); border-color: rgba(43,53,64,0.28); }
+
+  .category-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cat-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(43,53,64,0.1);
+    background: var(--navy-panel-2);
+    color: var(--ink-light);
+    padding: 13px 14px;
+    border-radius: var(--radius-s);
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .cat-btn:hover { background: #DCCB9E; border-color: rgba(43,53,64,0.22); }
+  .cat-btn:active { transform: scale(0.98); }
+  .cat-swatch {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  .entry-hint {
+    margin: 16px 2px 0;
+    font-size: 0.76rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+
+  .just-added {
+    margin: 14px 0 0;
+    padding: 10px 12px;
+    background: rgba(166,63,48,0.13);
+    border: 1px solid rgba(166,63,48,0.32);
+    border-radius: var(--radius-s);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--stamp-dim);
+    display: none;
+  }
+  .just-added.show { display: block; }
+
+  /* ---- Dashboard ---- */
+  .dashboard { display: flex; flex-direction: column; gap: 18px; }
+
+  .totals-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .total-card {
+    background: var(--paper);
+    border: 1px solid rgba(43,53,64,0.07);
+    border-radius: var(--radius-m);
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(43,53,64,0.08);
+  }
+  .total-card::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+  .total-card.application::before { background: var(--stamp); }
+  .total-card.contract::before { background: var(--navy-panel-2); }
+  .total-label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--ink-dark-muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .total-number {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink-dark);
+    line-height: 1;
+  }
+  .total-number .unit { font-family: var(--font-jp); font-size: 0.95rem; font-weight: 500; color: var(--ink-dark-muted); margin-left: 6px; }
+
+  .breakdown {
+    background: var(--paper);
+    border: 1px solid rgba(43,53,64,0.07);
+    border-radius: var(--radius-m);
+    padding: 18px 20px 12px;
+    box-shadow: 0 2px 8px rgba(43,53,64,0.06);
+  }
+  .breakdown h2 {
+    font-family: var(--font-jp);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--ink-dark);
+    margin: 0 0 14px;
+  }
+  .table-scroll { overflow-x: auto; }
+  .matrix-table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-size: 0.74rem;
+  }
+  .matrix-table th, .matrix-table td {
+    border: 1px solid rgba(38,51,60,0.1);
+    padding: 6px 5px;
+    text-align: center;
+    color: var(--ink-dark);
+  }
+  .matrix-table thead th {
+    background: var(--paper-2);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink-dark-muted);
+    border-color: rgba(38,51,60,0.16);
+  }
+  .matrix-table tbody tr:nth-child(even):not(.grand-row) td {
+    background: rgba(38,51,60,0.03);
+  }
+  .matrix-table th.row-label {
+    font-family: var(--font-jp);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--ink-dark);
+    text-align: left;
+  }
+  .matrix-table td.row-label {
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    padding-left: 8px;
+  }
+  .matrix-table td.row-label .cat-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .matrix-table td.count-cell {
+    font-family: var(--font-mono);
+  }
+  .matrix-table td.total-cell {
+    font-weight: 700;
+    font-family: var(--font-mono);
+    background: rgba(0,0,0,0.02);
+  }
+  .matrix-table td.pct-cell {
+    font-family: var(--font-mono);
+    color: var(--c-randy);
+    font-weight: 700;
+  }
+  .matrix-table tr.grand-row td {
+    background: var(--paper-2);
+    font-weight: 700;
+  }
+  .matrix-table tr.grand-row td.pct-cell { color: var(--ink-dark); }
+  .matrix-caption {
+    font-size: 0.7rem;
+    color: var(--ink-dark-muted);
+    margin: 8px 2px 0;
+  }
+
+  .period-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: var(--navy-panel);
+    border: 1px solid rgba(43,53,64,0.08);
+    border-radius: var(--radius-m);
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(43,53,64,0.08);
+  }
+  .period-bar .period-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .period-bar label {
+    font-size: 0.76rem;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .period-select {
+    background: var(--navy-panel-2);
+    color: var(--ink-light);
+    border: 1px solid rgba(43,53,64,0.18);
+    border-radius: var(--radius-s);
+    padding: 7px 10px;
+    font-size: 0.84rem;
+  }
+  .period-note {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+
+  .log-panel {
+    background: var(--navy-panel);
+    border: 1px solid rgba(43,53,64,0.08);
+    border-radius: var(--radius-m);
+    padding: 18px 20px;
+    box-shadow: 0 3px 14px rgba(43,53,64,0.1);
+  }
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .log-header h2 { font-family: var(--font-jp); font-size: 1rem; font-weight: 700; letter-spacing: 0.01em; margin: 0; color: var(--ink-light); }
+  .log-header-actions { display: flex; gap: 8px; }
+  .backup-note {
+    margin: -4px 0 10px;
+    font-size: 0.72rem;
+    color: var(--c-fudousan);
+    min-height: 1em;
+  }
+  .reset-btn {
+    background: transparent;
+    border: 1px solid rgba(43,53,64,0.18);
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    border-radius: var(--radius-s);
+    cursor: pointer;
+  }
+  .reset-btn:hover { color: var(--ink-light); border-color: rgba(43,53,64,0.4); }
+
+  .log-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+  .log-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px solid rgba(43,53,64,0.08);
+    font-size: 0.82rem;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-type-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .log-type-tag.application { background: rgba(166,63,48,0.16); color: var(--stamp-dim); }
+  .log-type-tag.contract { background: rgba(43,53,64,0.08); color: var(--ink-light); }
+  .log-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .log-cat { color: var(--ink-light); flex: 1; }
+  .log-time {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    flex-shrink: 0;
+  }
+  .log-del {
+    background: none; border: none; color: var(--ink-muted); cursor: pointer;
+    font-size: 0.9rem; padding: 0 2px; flex-shrink: 0;
+  }
+  .log-del:hover { color: var(--stamp); }
+  .log-empty { color: var(--ink-muted); font-size: 0.82rem; padding: 10px 4px; }
+
+  .loading-note { color: var(--ink-muted); font-size: 0.82rem; padding: 20px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <h1>申込・契約 記録板</h1>
+    <p class="subtitle">土地の状況を選ぶだけで、申込と契約の件数を記録・集計します</p>
+    <p class="scale-note">このデータはこの端末のブラウザ内にのみ保存されます(他の人とは共有されません)。</p>
+    <button type="button" class="save-status" id="saveStatus"></button>
+  </header>
+
+  <main class="layout">
+    <section class="entry-panel">
+      <div class="load-error" id="loadError">
+        <p>データの読み込みに失敗しました。通信環境をご確認のうえ、もう一度お試しください。</p>
+        <button type="button" id="loadRetryBtn">再読み込み</button>
+      </div>
+      <div class="tab-switch">
+        <button class="tab-btn active" id="tabApplication">申込を登録</button>
+        <button class="tab-btn" id="tabContract">契約を登録</button>
+      </div>
+      <div class="month-field">
+        <label for="entryMonth">登録する月</label>
+        <input type="month" id="entryMonth">
+        <div class="month-shortcuts">
+          <button type="button" class="month-shortcut" id="monthThis">今月</button>
+          <button type="button" class="month-shortcut" id="monthLast">先月</button>
+        </div>
+      </div>
+      <div class="category-grid" id="categoryGrid"></div>
+      <p class="entry-hint" id="entryHint"></p>
+      <p class="just-added" id="justAdded"></p>
+    </section>
+
+    <section class="dashboard">
+      <div class="period-bar">
+        <div class="period-field">
+          <label for="periodSelect">表示する期</label>
+          <select class="period-select" id="periodSelect"></select>
+        </div>
+        <span class="period-note" id="periodNote"></span>
+      </div>
+
+      <div class="totals-row">
+        <div class="total-card application">
+          <span class="total-label">申込 合計</span>
+          <span class="total-number" id="appTotal">–<span class="unit">件</span></span>
+        </div>
+        <div class="total-card contract">
+          <span class="total-label">契約 合計</span>
+          <span class="total-number" id="contractTotal">–<span class="unit">件</span></span>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <h2>建築申込</h2>
+        <div class="table-scroll">
+          <table class="matrix-table" id="appMatrixTable">
+            <thead><tr id="appMatrixHead"></tr></thead>
+            <tbody id="appMatrixBody"></tbody>
+          </table>
+        </div>
+        <p class="matrix-caption">%は「建築申込 合計」に対するその項目の割合です。</p>
+      </div>
+
+      <div class="breakdown">
+        <h2>請負契約</h2>
+        <div class="table-scroll">
+          <table class="matrix-table" id="contractMatrixTable">
+            <thead><tr id="contractMatrixHead"></tr></thead>
+            <tbody id="contractMatrixBody"></tbody>
+          </table>
+        </div>
+        <p class="matrix-caption">%は「請負契約 合計」に対するその項目の割合です。</p>
+      </div>
+
+      <div class="log-panel">
+        <div class="log-header">
+          <h2>記録一覧</h2>
+          <div class="log-header-actions">
+            <button class="reset-btn" id="backupBtn">バックアップをコピー</button>
+            <button class="reset-btn" id="ctResetBtn">すべて消去</button>
+          </div>
+        </div>
+        <p class="backup-note" id="backupNote"></p>
+        <ul class="log-list" id="logList"><li class="log-empty">読み込み中...</li></ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  const APP_CATEGORIES = [
+    { key: "randy", label: "ランディで土地を決めた", color: "var(--c-randy)" },
+    { key: "fudousan", label: "不動産会社で土地を決めた", color: "var(--c-fudousan)" },
+    { key: "tochinashi", label: "申込時点で土地はまだない", color: "var(--c-tochinashi)" },
+    { key: "tochiari", label: "土地あり", color: "var(--c-tochiari)" },
+    { key: "fumei", label: "不明", color: "var(--c-fumei)" }
+  ];
+  const CONTRACT_CATEGORIES = [
+    { key: "randy", label: "ランディで土地を決めた", color: "var(--c-randy)" },
+    { key: "fudousan", label: "不動産会社で土地を決めた", color: "var(--c-fudousan)" },
+    { key: "tochiari", label: "土地あり", color: "var(--c-tochiari)" },
+    { key: "fumei", label: "不明", color: "var(--c-fumei)" }
+  ];
+  const CAT_LOOKUP = {};
+  APP_CATEGORIES.concat(CONTRACT_CATEGORIES).forEach(c => CAT_LOOKUP[c.key] = c);
+
+  const STORAGE_KEY = "construction-tracker-entries";
+  let entries = [];
+  let currentType = "application"; // or "contract"
+  let storageReady = false;
+
+  // メインの「ランディステップトラッカー」と同じCloudflare Worker経由の
+  // 共有ストレージを使う(複数人での利用データがGitHubに保存される)
+  const WORKER_URL = "https://randy-proxy.shimada-c1e.workers.dev";
+  const base = WORKER_URL.replace(/\/$/, "");
+
+  async function workerErrorDetail(res) {
+    try {
+      const body = await res.json();
+      if (body && body.error) return body.error;
+    } catch (e) { /* ignore */ }
+    return "status " + res.status;
+  }
+
+  const storage = {
+    async get(key) {
+      const res = await fetch(`${base}/store?t=${Date.now()}`);
+      if (!res.ok) throw new Error("Worker get failed: " + (await workerErrorDetail(res)));
+      const data = await res.json();
+      if (!(key in data)) throw new Error("key not found");
+      return { key, value: data[key] };
+    },
+    async set(key, value) {
+      const res = await fetch(`${base}/set`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+      });
+      if (!res.ok) throw new Error("Worker set failed: " + (await workerErrorDetail(res)));
+      return { key, value };
+    }
+  };
+
+  const categoryGridEl = document.getElementById("categoryGrid");
+  const entryHintEl = document.getElementById("entryHint");
+  const justAddedEl = document.getElementById("justAdded");
+  const tabApplicationEl = document.getElementById("tabApplication");
+  const tabContractEl = document.getElementById("tabContract");
+  const appTotalEl = document.getElementById("appTotal");
+  const contractTotalEl = document.getElementById("contractTotal");
+  const appMatrixHeadEl = document.getElementById("appMatrixHead");
+  const appMatrixBodyEl = document.getElementById("appMatrixBody");
+  const contractMatrixHeadEl = document.getElementById("contractMatrixHead");
+  const contractMatrixBodyEl = document.getElementById("contractMatrixBody");
+  const logListEl = document.getElementById("logList");
+  const resetBtn = document.getElementById("ctResetBtn");
+  const backupBtn = document.getElementById("backupBtn");
+  const backupNoteEl = document.getElementById("backupNote");
+  const periodSelectEl = document.getElementById("periodSelect");
+  const periodNoteEl = document.getElementById("periodNote");
+  const entryMonthEl = document.getElementById("entryMonth");
+  const monthThisBtn = document.getElementById("monthThis");
+  const monthLastBtn = document.getElementById("monthLast");
+  const saveStatusEl = document.getElementById("saveStatus");
+  const loadErrorEl = document.getElementById("loadError");
+  const loadRetryBtn = document.getElementById("loadRetryBtn");
+
+  function ymString(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }
+  function setEntryMonth(offsetMonths) {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + offsetMonths);
+    entryMonthEl.value = ymString(d);
+    updateMonthShortcutState();
+  }
+  function updateMonthShortcutState() {
+    monthThisBtn.classList.toggle("active", entryMonthEl.value === ymString(new Date()));
+    const lastMonthDate = new Date();
+    lastMonthDate.setDate(1);
+    lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+    monthLastBtn.classList.toggle("active", entryMonthEl.value === ymString(lastMonthDate));
+  }
+  function tsFromSelectedMonth() {
+    const val = entryMonthEl.value; // "YYYY-MM"
+    const now = new Date();
+    if (!val) return now.getTime();
+    const [y, m] = val.split("-").map(Number);
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const day = Math.min(now.getDate(), daysInMonth);
+    return new Date(y, m - 1, day, now.getHours(), now.getMinutes(), now.getSeconds()).getTime();
+  }
+
+  const MONTH_LABELS = ["7月","8月","9月","10月","11月","12月","1月","2月","3月","4月","5月","6月"];
+
+  // 期は7月始まり(例: 2025年7月〜2026年6月)
+  function fiscalStartYear(ts) {
+    const d = new Date(ts);
+    const month = d.getMonth() + 1;
+    const year = d.getFullYear();
+    return month >= 7 ? year : year - 1;
+  }
+  function periodLabel(startYear) {
+    return `${startYear}年7月〜${startYear + 1}年6月`;
+  }
+  function monthIndexInFiscal(ts) {
+    const m = new Date(ts).getMonth() + 1;
+    return m >= 7 ? m - 7 : m + 5; // 0 = July ... 11 = June
+  }
+
+  let selectedPeriod = String(fiscalStartYear(Date.now())); // "all" or e.g. "2025"
+
+  function getFilteredEntries() {
+    if (selectedPeriod === "all") return entries;
+    return entries.filter(e => String(fiscalStartYear(e.ts)) === selectedPeriod);
+  }
+
+  function populatePeriodSelect() {
+    const periodsSet = new Set(entries.map(e => fiscalStartYear(e.ts)));
+    periodsSet.add(fiscalStartYear(Date.now()));
+    const periods = Array.from(periodsSet).sort((a, b) => b - a);
+
+    const prev = selectedPeriod;
+    periodSelectEl.innerHTML = "";
+    const allOpt = document.createElement("option");
+    allOpt.value = "all";
+    allOpt.textContent = "すべての期";
+    periodSelectEl.appendChild(allOpt);
+    periods.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = String(p);
+      opt.textContent = periodLabel(p);
+      periodSelectEl.appendChild(opt);
+    });
+    const values = Array.from(periodSelectEl.options).map(o => o.value);
+    periodSelectEl.value = values.includes(prev) ? prev : String(fiscalStartYear(Date.now()));
+    selectedPeriod = periodSelectEl.value;
+
+    periodNoteEl.textContent = "本日時点の期:" + periodLabel(fiscalStartYear(Date.now()));
+  }
+
+  function fmtMonth(ts) {
+    const d = new Date(ts);
+    return `${d.getFullYear()}年${d.getMonth() + 1}月`;
+  }
+
+  function isNotFoundError(err) {
+    const msg = String((err && err.message) || err || "");
+    return /not.?found/i.test(msg) || /404/.test(msg) || /no such key/i.test(msg);
+  }
+
+  function setSaveStatus(state) {
+    saveStatusEl.classList.remove("saving", "saved", "error");
+    if (state === "saving") {
+      saveStatusEl.classList.add("saving");
+      saveStatusEl.textContent = "保存中…";
+    } else if (state === "saved") {
+      saveStatusEl.classList.add("saved");
+      saveStatusEl.textContent = "保存済み";
+    } else if (state === "error") {
+      saveStatusEl.classList.add("error");
+      saveStatusEl.textContent = "保存できていません(タップで再試行)";
+    } else {
+      saveStatusEl.textContent = "";
+    }
+  }
+
+  function showLoadError(show) {
+    loadErrorEl.classList.toggle("show", show);
+  }
+
+  async function loadEntries() {
+    showLoadError(false);
+    let lastErr = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await storage.get(STORAGE_KEY);
+        entries = res && res.value ? JSON.parse(res.value) : [];
+        storageReady = true;
+        renderAll();
+        return;
+      } catch (e) {
+        if (isNotFoundError(e)) {
+          // まだ一件も記録がない状態。エラーではなく空リストとして扱う。
+          entries = [];
+          storageReady = true;
+          renderAll();
+          return;
+        }
+        lastErr = e;
+        await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+      }
+    }
+    console.error("データの読み込みに失敗しました", lastErr);
+    storageReady = false;
+    showLoadError(true);
+  }
+
+  // すべての保存を1本のキューに直列化し、同時クリックによる上書き競合を防ぐ
+  let saveChain = Promise.resolve();
+  let pendingRetryTimer = null;
+
+  function queueSave() {
+    saveChain = saveChain.then(() => performSave());
+    return saveChain;
+  }
+
+  async function performSave() {
+    setSaveStatus("saving");
+    const payload = JSON.stringify(entries);
+    let lastErr = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await storage.set(STORAGE_KEY, payload);
+        if (!res) throw new Error("保存結果が空でした");
+        setSaveStatus("saved");
+        if (pendingRetryTimer) { clearTimeout(pendingRetryTimer); pendingRetryTimer = null; }
+        return true;
+      } catch (e) {
+        lastErr = e;
+        await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+      }
+    }
+    console.error("保存に失敗しました", lastErr);
+    setSaveStatus("error");
+    // しばらくしてから自動で再試行する
+    if (pendingRetryTimer) clearTimeout(pendingRetryTimer);
+    pendingRetryTimer = setTimeout(() => queueSave(), 12000);
+    return false;
+  }
+
+  function addEntry(type, catKey) {
+    if (!storageReady) {
+      alert("データの読み込みが完了していないため、登録できません。ページを再読み込みしてください。");
+      return;
+    }
+    const entry = {
+      id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+      type: type,
+      category: catKey,
+      ts: tsFromSelectedMonth()
+    };
+    entries.push(entry);
+    queueSave();
+    renderAll();
+    const cat = CAT_LOOKUP[catKey];
+    const monthText = fmtMonth(entry.ts);
+    justAddedEl.textContent = `${monthText}分として${type === "application" ? "申込" : "契約"}を記録しました:${cat.label}`;
+    justAddedEl.classList.add("show");
+    clearTimeout(justAddedEl._t);
+    justAddedEl._t = setTimeout(() => justAddedEl.classList.remove("show"), 2400);
+  }
+
+  function deleteEntry(id) {
+    entries = entries.filter(e => e.id !== id);
+    queueSave();
+    renderAll();
+  }
+
+  async function copyBackup() {
+    const payload = JSON.stringify(entries, null, 2);
+    let copied = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(payload);
+        copied = true;
+      }
+    } catch (e) { /* fall through to legacy method */ }
+
+    if (!copied) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = payload;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        copied = document.execCommand("copy");
+        document.body.removeChild(ta);
+      } catch (e) { copied = false; }
+    }
+
+    backupNoteEl.textContent = copied
+      ? `コピーしました(${entries.length}件)。テキストファイルなどに貼り付けて保管してください。`
+      : "コピーできませんでした。お使いのブラウザではクリップボードが使えない可能性があります。";
+    if (!copied) {
+      window.prompt("以下を選択してコピーしてください:", payload);
+    }
+    clearTimeout(backupNoteEl._t);
+    backupNoteEl._t = setTimeout(() => { backupNoteEl.textContent = ""; }, 6000);
+  }
+
+  async function resetAll() {
+    if (!confirm("すべての記録を消去します。よろしいですか?")) return;
+    entries = [];
+    await queueSave();
+    renderAll();
+  }
+
+  function renderCategoryGrid() {
+    const cats = currentType === "application" ? APP_CATEGORIES : CONTRACT_CATEGORIES;
+    categoryGridEl.innerHTML = "";
+    cats.forEach(cat => {
+      const btn = document.createElement("button");
+      btn.className = "cat-btn";
+      btn.innerHTML = `<span class="cat-swatch" style="background:${cat.color}"></span><span>${cat.label}</span>`;
+      btn.addEventListener("click", () => addEntry(currentType, cat.key));
+      categoryGridEl.appendChild(btn);
+    });
+    entryHintEl.textContent = currentType === "application"
+      ? "土地の状況を選ぶと、上で選んだ月に申込が1件記録されます。"
+      : "土地の状況を選ぶと、上で選んだ月に契約が1件記録されます。";
+  }
+
+  function renderMatrixTable(headEl, bodyEl, cats, type, source, cornerLabel) {
+    const typeEntries = source.filter(e => e.type === type);
+    const grandTotal = typeEntries.length;
+
+    // header row: corner label + 12 months + 計 + %
+    headEl.innerHTML = `<th class="row-label">${cornerLabel}</th>` +
+      MONTH_LABELS.map(m => `<th>${m}</th>`).join("") +
+      `<th>計</th><th>%</th>`;
+
+    const monthTotals = Array(12).fill(0);
+    bodyEl.innerHTML = "";
+
+    cats.forEach(cat => {
+      const monthCounts = Array(12).fill(0);
+      typeEntries
+        .filter(e => e.category === cat.key)
+        .forEach(e => { monthCounts[monthIndexInFiscal(e.ts)] += 1; });
+      monthCounts.forEach((c, i) => { monthTotals[i] += c; });
+      const catTotal = monthCounts.reduce((a, b) => a + b, 0);
+      const pct = grandTotal > 0 ? ((catTotal / grandTotal) * 100).toFixed(2) : "0.00";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="row-label"><span class="cat-dot" style="background:${cat.color}"></span>${cat.label}</td>
+        ${monthCounts.map(c => `<td class="count-cell">${c}</td>`).join("")}
+        <td class="total-cell">${catTotal}</td>
+        <td class="pct-cell">${pct}%</td>
+      `;
+      bodyEl.appendChild(tr);
+    });
+
+    const grandPct = grandTotal > 0 ? "100.00" : "0.00";
+    const grandRow = document.createElement("tr");
+    grandRow.className = "grand-row";
+    grandRow.innerHTML = `
+      <td class="row-label">合計</td>
+      ${monthTotals.map(c => `<td class="count-cell">${c}</td>`).join("")}
+      <td class="total-cell">${grandTotal}</td>
+      <td class="pct-cell">${grandPct}%</td>
+    `;
+    bodyEl.appendChild(grandRow);
+  }
+
+  function renderLog(source) {
+    const sorted = [...source].sort((a, b) => b.ts - a.ts);
+    logListEl.innerHTML = "";
+    if (sorted.length === 0) {
+      logListEl.innerHTML = '<li class="log-empty">まだ記録がありません。</li>';
+      return;
+    }
+    sorted.forEach(e => {
+      const cat = CAT_LOOKUP[e.category];
+      const li = document.createElement("li");
+      li.className = "log-item";
+      li.innerHTML = `
+        <span class="log-type-tag ${e.type}">${e.type === "application" ? "申込" : "契約"}</span>
+        <span class="log-swatch" style="background:${cat.color}"></span>
+        <span class="log-cat">${cat.label}</span>
+        <span class="log-time">${fmtMonth(e.ts)}</span>
+        <button class="log-del" title="削除" data-id="${e.id}">×</button>
+      `;
+      logListEl.appendChild(li);
+    });
+    logListEl.querySelectorAll(".log-del").forEach(btn => {
+      btn.addEventListener("click", () => deleteEntry(btn.dataset.id));
+    });
+  }
+
+  function renderTotals(source) {
+    const appCount = source.filter(e => e.type === "application").length;
+    const contractCount = source.filter(e => e.type === "contract").length;
+    appTotalEl.innerHTML = appCount + '<span class="unit">件</span>';
+    contractTotalEl.innerHTML = contractCount + '<span class="unit">件</span>';
+  }
+
+  function renderAll() {
+    if (!storageReady) return;
+    populatePeriodSelect();
+    const filtered = getFilteredEntries();
+    const cornerLabel = selectedPeriod === "all" ? "すべての期" : periodLabel(parseInt(selectedPeriod, 10));
+    renderTotals(filtered);
+    renderMatrixTable(appMatrixHeadEl, appMatrixBodyEl, APP_CATEGORIES, "application", filtered, cornerLabel);
+    renderMatrixTable(contractMatrixHeadEl, contractMatrixBodyEl, CONTRACT_CATEGORIES, "contract", filtered, cornerLabel);
+    renderLog(filtered);
+  }
+
+  tabApplicationEl.addEventListener("click", () => {
+    currentType = "application";
+    tabApplicationEl.classList.add("active");
+    tabContractEl.classList.remove("active");
+    renderCategoryGrid();
+  });
+  tabContractEl.addEventListener("click", () => {
+    currentType = "contract";
+    tabContractEl.classList.add("active");
+    tabApplicationEl.classList.remove("active");
+    renderCategoryGrid();
+  });
+  resetBtn.addEventListener("click", resetAll);
+  backupBtn.addEventListener("click", copyBackup);
+  periodSelectEl.addEventListener("change", () => {
+    selectedPeriod = periodSelectEl.value;
+    renderAll();
+  });
+  monthThisBtn.addEventListener("click", () => setEntryMonth(0));
+  monthLastBtn.addEventListener("click", () => setEntryMonth(-1));
+  entryMonthEl.addEventListener("change", updateMonthShortcutState);
+  saveStatusEl.addEventListener("click", () => {
+    if (saveStatusEl.classList.contains("error")) queueSave();
+  });
+  loadRetryBtn.addEventListener("click", () => location.reload());
+
+  setEntryMonth(0);
+  renderCategoryGrid();
+  loadEntries();
+})();
+</script>
+</body>
+</html>
