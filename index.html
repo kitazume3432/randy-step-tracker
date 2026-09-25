@@ -27,6 +27,13 @@
   }
   .wrap { max-width: 1760px; margin: 0 auto; padding: 26px 22px 60px; }
 
+  .view-tab-bar { display: flex; gap: 4px; margin-bottom: 14px; }
+  .view-tab {
+    font-size: 12px; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: #fff; color: var(--ink-soft); cursor: pointer; font-family: inherit;
+  }
+  .view-tab.active { background: var(--orange-soft); color: var(--orange-deep); border-color: var(--orange); font-weight: 700; }
+
   header.top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
   header.top .title-block { display: flex; align-items: center; gap: 12px; }
   .logo-chip {
@@ -240,6 +247,13 @@
 <body>
 <div class="wrap">
 
+  <div class="view-tab-bar">
+    <button class="view-tab active" id="tabViewSteps" type="button">ステップ管理</button>
+    <button class="view-tab" id="tabViewContract" type="button">申込・契約</button>
+  </div>
+
+  <div id="viewSteps">
+
   <header class="top">
     <div class="title-block">
       <div class="logo-chip">ラ</div>
@@ -296,6 +310,14 @@
   </details>
 
   <footer class="note">初期データ: STEP タブ（ランディ集計）｜以降の追加・変更はこのボード上に保存されます</footer>
+
+  </div><!-- /viewSteps -->
+
+  <div id="viewContract" style="display:none;">
+    <iframe id="contractFrame" src="contract-tracker.html" title="申込・契約 記録板"
+      style="width:100%;min-height:80vh;border:0;border-radius:10px;background:#fff;box-shadow:0 2px 10px rgba(43,53,64,0.08);"></iframe>
+  </div>
+
 </div>
 
 <!-- Edit / Add modal -->
@@ -1595,6 +1617,30 @@ document.getElementById("visitPasteOverlay").addEventListener("click", (e) => {
 (async () => {
   await loadStaffList();
   await loadCustomers();
+})();
+
+// ---- タブ切り替え（ステップ管理 / 申込・契約） ----
+(function () {
+  const tabSteps = document.getElementById("tabViewSteps");
+  const tabContract = document.getElementById("tabViewContract");
+  const viewSteps = document.getElementById("viewSteps");
+  const viewContract = document.getElementById("viewContract");
+  let contractLoaded = false;
+
+  function showView(view) {
+    const isSteps = view === "steps";
+    viewSteps.style.display = isSteps ? "" : "none";
+    viewContract.style.display = isSteps ? "none" : "";
+    tabSteps.classList.toggle("active", isSteps);
+    tabContract.classList.toggle("active", !isSteps);
+    if (!isSteps && !contractLoaded) {
+      // 初めてタブを開いたときだけiframeを読み込む
+      contractLoaded = true;
+    }
+  }
+
+  tabSteps.addEventListener("click", () => showView("steps"));
+  tabContract.addEventListener("click", () => showView("contract"));
 })();
 </script>
 </body>
