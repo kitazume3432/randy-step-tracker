@@ -9,27 +9,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-page: #FBF7ED;
-    --navy-deep: #ECE0C4;
-    --navy-panel: #F3ECDC;
-    --navy-panel-2: #E6D8B4;
-    --grid-line: rgba(80,66,40,0.055);
-    --ink-light: #2B3540;
-    --ink-muted: #8C806B;
+    /* ランディ ステップトラッカー本体と同じ配色に統一 */
+    --bg-page: #faf6f2;
+    --navy-deep: #fdeee7;
+    --navy-panel: #ffffff;
+    --navy-panel-2: #fdeee7;
+    --grid-line: transparent;
+    --ink-light: #2b2320;
+    --ink-muted: #8a7d74;
     --paper: #FFFFFF;
-    --paper-2: #F1EADC;
-    --ink-dark: #2B3540;
-    --ink-dark-muted: #6B7880;
-    --stamp: #A63F30;
-    --stamp-dim: #8A362A;
+    --paper-2: #fdeee7;
+    --ink-dark: #2b2320;
+    --ink-dark-muted: #8a7d74;
+    --stamp: #d9502c;
+    --stamp-dim: #b53d1f;
     --c-randy: #3D739C;
     --c-fudousan: #4C8566;
     --c-tochinashi: #C0954A;
     --c-tochiari: #86597D;
     --c-fumei: #7C8790;
-    --radius-s: 4px;
-    --radius-m: 8px;
-    --font-jp: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic Medium", "Yu Gothic", Meiryo, system-ui, sans-serif;
+    --radius-s: 6px;
+    --radius-m: 10px;
+    --font-jp: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", sans-serif;
     --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     font-size: 16px;
   }
@@ -39,13 +40,11 @@
   body {
     margin: 0;
     background: var(--bg-page);
-    background-image:
-      repeating-linear-gradient(0deg, var(--grid-line) 0, var(--grid-line) 1px, transparent 1px, transparent 28px),
-      repeating-linear-gradient(90deg, var(--grid-line) 0, var(--grid-line) 1px, transparent 1px, transparent 28px);
     color: var(--ink-dark);
     font-family: var(--font-jp);
     line-height: 1.6;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
   .app { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
@@ -56,14 +55,14 @@
     position: relative;
     background: var(--navy-panel);
     border-radius: var(--radius-m);
-    box-shadow: 0 3px 14px rgba(43,53,64,0.14);
+    box-shadow: 0 3px 14px rgba(60,30,10,0.14);
   }
   .app-header::after {
     content: "";
     position: absolute;
     left: 0; right: 0; bottom: 0;
     height: 1px;
-    background: linear-gradient(90deg, var(--stamp) 0, var(--stamp) 48px, rgba(43,53,64,0.12) 48px);
+    background: linear-gradient(90deg, var(--stamp) 0, var(--stamp) 48px, rgba(60,30,10,0.12) 48px);
   }
   .app-header h1 {
     font-family: var(--font-jp);
@@ -97,8 +96,8 @@
     font-family: var(--font-jp);
     font-size: 0.72rem;
     font-weight: 600;
-    border: 1px solid rgba(43,53,64,0.14);
-    background: rgba(43,53,64,0.05);
+    border: 1px solid rgba(60,30,10,0.14);
+    background: rgba(60,30,10,0.05);
     color: var(--ink-muted);
     cursor: default;
   }
@@ -161,12 +160,12 @@
   /* ---- Entry panel ---- */
   .entry-panel {
     background: var(--navy-panel);
-    border: 1px solid rgba(43,53,64,0.08);
+    border: 1px solid rgba(60,30,10,0.08);
     border-radius: var(--radius-m);
     padding: 18px;
     position: sticky;
     top: 20px;
-    box-shadow: 0 3px 14px rgba(43,53,64,0.1);
+    box-shadow: 0 3px 14px rgba(60,30,10,0.1);
   }
 
   .tab-switch {
@@ -192,7 +191,7 @@
   .tab-btn.active {
     background: var(--navy-panel-2);
     color: var(--ink-light);
-    box-shadow: inset 0 0 0 1px rgba(43,53,64,0.12);
+    box-shadow: inset 0 0 0 1px rgba(60,30,10,0.12);
   }
 
   .month-field {
@@ -201,7 +200,7 @@
     gap: 8px;
     margin-bottom: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid rgba(43,53,64,0.1);
+    border-bottom: 1px solid rgba(60,30,10,0.1);
   }
   .month-field label {
     font-size: 0.76rem;
@@ -209,7 +208,7 @@
   }
   .month-field input[type="month"] {
     background: var(--navy-panel-2);
-    border: 1px solid rgba(43,53,64,0.15);
+    border: 1px solid rgba(60,30,10,0.15);
     color: var(--ink-light);
     padding: 9px 10px;
     border-radius: var(--radius-s);
@@ -221,7 +220,7 @@
   .month-shortcut {
     flex: 1;
     background: transparent;
-    border: 1px solid rgba(43,53,64,0.15);
+    border: 1px solid rgba(60,30,10,0.15);
     color: var(--ink-muted);
     font-size: 0.74rem;
     padding: 6px 8px;
@@ -230,7 +229,7 @@
     transition: background 0.15s ease, color 0.15s ease;
   }
   .month-shortcut:hover { background: var(--navy-panel-2); color: var(--ink-light); }
-  .month-shortcut.active { background: var(--navy-panel-2); color: var(--ink-light); border-color: rgba(43,53,64,0.28); }
+  .month-shortcut.active { background: var(--navy-panel-2); color: var(--ink-light); border-color: rgba(60,30,10,0.28); }
 
   .category-grid {
     display: flex;
@@ -244,7 +243,7 @@
     gap: 10px;
     width: 100%;
     text-align: left;
-    border: 1px solid rgba(43,53,64,0.1);
+    border: 1px solid rgba(60,30,10,0.1);
     background: var(--navy-panel-2);
     color: var(--ink-light);
     padding: 13px 14px;
@@ -253,7 +252,7 @@
     cursor: pointer;
     transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
   }
-  .cat-btn:hover { background: #DCCB9E; border-color: rgba(43,53,64,0.22); }
+  .cat-btn:hover { background: #fde3d4; border-color: rgba(60,30,10,0.22); }
   .cat-btn:active { transform: scale(0.98); }
   .cat-swatch {
     width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
@@ -289,12 +288,12 @@
   }
   .total-card {
     background: var(--paper);
-    border: 1px solid rgba(43,53,64,0.07);
+    border: 1px solid rgba(60,30,10,0.07);
     border-radius: var(--radius-m);
     padding: 20px 22px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(43,53,64,0.08);
+    box-shadow: 0 2px 8px rgba(60,30,10,0.08);
   }
   .total-card::before {
     content: "";
@@ -323,10 +322,10 @@
 
   .breakdown {
     background: var(--paper);
-    border: 1px solid rgba(43,53,64,0.07);
+    border: 1px solid rgba(60,30,10,0.07);
     border-radius: var(--radius-m);
     padding: 18px 20px 12px;
-    box-shadow: 0 2px 8px rgba(43,53,64,0.06);
+    box-shadow: 0 2px 8px rgba(60,30,10,0.06);
   }
   .breakdown h2 {
     font-family: var(--font-jp);
@@ -410,10 +409,10 @@
     flex-wrap: wrap;
     gap: 10px;
     background: var(--navy-panel);
-    border: 1px solid rgba(43,53,64,0.08);
+    border: 1px solid rgba(60,30,10,0.08);
     border-radius: var(--radius-m);
     padding: 12px 16px;
-    box-shadow: 0 2px 8px rgba(43,53,64,0.08);
+    box-shadow: 0 2px 8px rgba(60,30,10,0.08);
   }
   .period-bar .period-field {
     display: flex;
@@ -428,7 +427,7 @@
   .period-select {
     background: var(--navy-panel-2);
     color: var(--ink-light);
-    border: 1px solid rgba(43,53,64,0.18);
+    border: 1px solid rgba(60,30,10,0.18);
     border-radius: var(--radius-s);
     padding: 7px 10px;
     font-size: 0.84rem;
@@ -441,10 +440,10 @@
 
   .log-panel {
     background: var(--navy-panel);
-    border: 1px solid rgba(43,53,64,0.08);
+    border: 1px solid rgba(60,30,10,0.08);
     border-radius: var(--radius-m);
     padding: 18px 20px;
-    box-shadow: 0 3px 14px rgba(43,53,64,0.1);
+    box-shadow: 0 3px 14px rgba(60,30,10,0.1);
   }
   .log-header {
     display: flex;
@@ -464,14 +463,14 @@
   }
   .reset-btn {
     background: transparent;
-    border: 1px solid rgba(43,53,64,0.18);
+    border: 1px solid rgba(60,30,10,0.18);
     color: var(--ink-muted);
     font-size: 0.72rem;
     padding: 6px 10px;
     border-radius: var(--radius-s);
     cursor: pointer;
   }
-  .reset-btn:hover { color: var(--ink-light); border-color: rgba(43,53,64,0.4); }
+  .reset-btn:hover { color: var(--ink-light); border-color: rgba(60,30,10,0.4); }
 
   .log-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
   .log-item {
@@ -479,7 +478,7 @@
     align-items: center;
     gap: 10px;
     padding: 9px 4px;
-    border-bottom: 1px solid rgba(43,53,64,0.08);
+    border-bottom: 1px solid rgba(60,30,10,0.08);
     font-size: 0.82rem;
   }
   .log-item:last-child { border-bottom: none; }
@@ -491,7 +490,7 @@
     flex-shrink: 0;
   }
   .log-type-tag.application { background: rgba(166,63,48,0.16); color: var(--stamp-dim); }
-  .log-type-tag.contract { background: rgba(43,53,64,0.08); color: var(--ink-light); }
+  .log-type-tag.contract { background: rgba(60,30,10,0.08); color: var(--ink-light); }
   .log-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .log-cat { color: var(--ink-light); flex: 1; }
   .log-time {
