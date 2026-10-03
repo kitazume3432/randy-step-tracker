@@ -128,6 +128,12 @@
     transition: box-shadow 0.15s ease, transform 0.1s ease; cursor: pointer;
   }
   .card:hover { box-shadow: 0 3px 10px rgba(60,30,10,0.09); transform: translateY(-1px); }
+  .card.just-saved { animation: just-saved-flash 1.6s ease; }
+  @keyframes just-saved-flash {
+    0% { box-shadow: 0 0 0 3px var(--orange), 0 3px 10px rgba(60,30,10,0.09); }
+    70% { box-shadow: 0 0 0 3px var(--orange), 0 3px 10px rgba(60,30,10,0.09); }
+    100% { box-shadow: none; }
+  }
   .card.churned { opacity: 0.55; background: #f5f2ef; }
   .card-top { display: flex; align-items: center; gap: 7px; }
   .avatar {
@@ -532,6 +538,7 @@ const STAFF_PALETTE = [
 
 let customers = [];
 let staffList = [];
+let lastEditedId = null; // 保存直後のお客様IDを一時的に覚えておき、そのカードまでスクロール・ハイライトするために使う
 let sessionId = "s-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
 let currentUser = "";
 
@@ -1297,6 +1304,14 @@ function render() {
 
   const board = document.getElementById("board");
   if (board) {
+    // 再描画で各列のスクロール位置が先頭に戻ってしまわないよう、列ごとに今のスクロール位置を覚えておく
+    const scrollPositions = {};
+    board.querySelectorAll(".column").forEach(colEl => {
+      const key = colEl.dataset.colKey;
+      const cardsEl = colEl.querySelector(".cards");
+      if (key !== undefined && cardsEl) scrollPositions[key] = cardsEl.scrollTop;
+    });
+
     board.innerHTML = COLUMNS.map(col => {
       const items = list.filter(c => progressKey(c) === col.key)
         .slice()
@@ -1307,7 +1322,7 @@ function render() {
           return (a.staff || "").localeCompare(b.staff || "", "ja");
         });
       const body = items.length ? items.map(makeCard).join("") : `<div class="empty-col">該当なし</div>`;
-      return `<div class="column" style="--col-accent:${col.accent}; --col-tint:${col.tint}">
+      return `<div class="column" data-col-key="${col.key}" style="--col-accent:${col.accent}; --col-tint:${col.tint}">
         <div class="column-head">
           <div class="step-tag">${col.tag}</div>
           <div class="step-name">${col.name}</div>
@@ -1316,6 +1331,30 @@ function render() {
         <div class="cards">${body}</div>
       </div>`;
     }).join("");
+
+    // スクロール位置を復元。ただし、たった今保存したカードがある列は、
+    // そのカードが見える位置までスクロールして保存されたことを分かりやすくする
+    board.querySelectorAll(".column").forEach(colEl => {
+      const key = colEl.dataset.colKey;
+      const cardsEl = colEl.querySelector(".cards");
+      if (!cardsEl) return;
+      if (lastEditedId && colEl.querySelector(`.card[data-id="${lastEditedId}"]`)) {
+        return; // 後でまとめてスクロール・ハイライトする
+      }
+      if (key !== undefined && scrollPositions[key] !== undefined) {
+        cardsEl.scrollTop = scrollPositions[key];
+      }
+    });
+
+    if (lastEditedId) {
+      const savedCard = board.querySelector(`.card[data-id="${lastEditedId}"]`);
+      if (savedCard) {
+        savedCard.scrollIntoView({ block: "center", behavior: "auto" });
+        savedCard.classList.add("just-saved");
+        setTimeout(() => savedCard.classList.remove("just-saved"), 1600);
+      }
+      lastEditedId = null;
+    }
 
     board.querySelectorAll(".card").forEach(el => {
       el.addEventListener("click", () => openModal(el.dataset.id));
@@ -1435,6 +1474,7 @@ async function handleSave() {
   }
   const ok = await saveCustomers();
   await closeModal();
+  lastEditedId = record.id;
   render();
   if (ok) {
     toast("保存しました。");
