@@ -68,6 +68,26 @@
   .flow-seg:first-child { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); padding-left: 14px; }
   .flow-seg .n { display:block; font-size:20px; font-weight:800; margin-top:1px; }
   .flow-seg .lbl { display:block; font-size: 10.5px; font-weight: 500; opacity: 0.92; white-space: nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .flow-seg.has-docs { cursor: pointer; }
+  .flow-seg.has-docs:hover { filter: brightness(1.08); }
+  .flow-seg .doc-badge {
+    position: absolute; top: 4px; right: 10px; font-size: 12px; line-height: 1;
+    background: rgba(255,255,255,0.92); color: var(--orange-deep);
+    border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+  }
+
+  .step-docs-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+  .step-docs-list .step-doc-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: var(--orange-pale); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .step-docs-list .step-doc-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .step-docs-list .step-doc-open {
+    background: var(--orange); color: #fff; border: none; padding: 6px 14px; border-radius: 7px;
+    font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block;
+  }
+  .step-docs-empty { color: var(--ink-soft); font-size: 13px; padding: 8px 2px; }
 
   .toolbar {
     display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
@@ -432,6 +452,18 @@
   </div>
 </div>
 
+<!-- STEP別の資料（困ったときに見る案内PDF）一覧モーダル -->
+<div class="overlay hidden" id="stepDocsOverlay">
+  <div class="modal small">
+    <h2 id="stepDocsTitle">資料</h2>
+    <p class="desc">このステップで困ったときは、下の資料を確認してください。</p>
+    <div id="stepDocsList" class="step-docs-list"></div>
+    <div class="modal-actions center">
+      <button class="btn-plain" id="stepDocsCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm modal (replaces window.confirm) -->
 <div class="overlay hidden" id="confirmOverlay">
   <div class="modal small">
@@ -520,6 +552,21 @@ const COLUMNS = [
   { key:"ST4", tag:"STEP 4", name:"仮審査", accent:"#c94824", tint:"#fad9ca" },
   { key:"ST5", tag:"STEP 5", name:"プラン入り・買付・建築申込", accent:"#b53d1f", tint:"#f8d1bf" },
 ];
+
+// STEPごとの案内資料（PDF）。1つのSTEPに複数の資料を置くこともできる。
+// file は index.html から見た相対パス（docs/ フォルダに置いたPDFを指す）。
+// 資料を増やす・差し替えるときは、この配列に行を追加・編集してください。
+const STEP_DOCS = {
+  "ST1": [
+    { title: "STEP1 困ったときの資料", file: "docs/step1-1.pdf" },
+  ],
+  "ST2": [
+    { title: "STEP2 困ったときの資料", file: "docs/step2-1.pdf" },
+  ],
+  "ST3": [
+    { title: "STEP3 困ったときの資料", file: "docs/step3-1.pdf" },
+  ],
+};
 
 const STAFF_PALETTE = [
   { bg:"#e8f1fb", text:"#2f5f9e" },
@@ -723,6 +770,28 @@ function askConfirm(title, message) {
     noBtn.addEventListener("click", onNo);
   });
 }
+
+/* ---------- STEPごとの案内資料（PDF）モーダル ---------- */
+function openStepDocs(colKey) {
+  const docs = STEP_DOCS[colKey] || [];
+  const col = COLUMNS.find(c => c.key === colKey);
+  const overlay = document.getElementById("stepDocsOverlay");
+  document.getElementById("stepDocsTitle").textContent = col ? `${col.tag} の資料` : "資料";
+  const listEl = document.getElementById("stepDocsList");
+  listEl.innerHTML = docs.length
+    ? docs.map(d => `<div class="step-doc-row">
+        <span class="step-doc-name">📄 ${d.title}</span>
+        <a class="step-doc-open" href="${d.file}" target="_blank" rel="noopener">開く</a>
+      </div>`).join("")
+    : `<div class="step-docs-empty">このステップにはまだ資料が登録されていません。</div>`;
+  overlay.classList.remove("hidden");
+}
+document.getElementById("stepDocsCloseBtn").addEventListener("click", () => {
+  document.getElementById("stepDocsOverlay").classList.add("hidden");
+});
+document.getElementById("stepDocsOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "stepDocsOverlay") e.target.classList.add("hidden");
+});
 
 /* ---------- Randy link opener (with fallback if popups are blocked) ---------- */
 function showLinkModal(url) {
@@ -1295,12 +1364,18 @@ function render() {
   const flowBar = document.getElementById("flowBar");
   flowBar.innerHTML = COLUMNS.map(col => {
     const cnt = list.filter(c => progressKey(c) === col.key).length;
-    return `<div class="flow-seg" style="background:${col.accent}">
+    const docs = STEP_DOCS[col.key] || [];
+    const hasDocs = docs.length > 0;
+    return `<div class="flow-seg${hasDocs ? " has-docs" : ""}" data-col-key="${col.key}" style="background:${col.accent}" title="${hasDocs ? "クリックして困ったときの資料を見る" : ""}">
+      ${hasDocs ? `<span class="doc-badge">📄</span>` : ""}
       <span class="lbl">${col.tag}</span>
       <span class="n">${cnt}</span>
       <span class="lbl">${col.name}</span>
     </div>`;
   }).join("");
+  flowBar.querySelectorAll(".flow-seg.has-docs").forEach(el => {
+    el.addEventListener("click", () => openStepDocs(el.dataset.colKey));
+  });
 
   const board = document.getElementById("board");
   if (board) {
