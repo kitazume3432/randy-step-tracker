@@ -1,0 +1,8 @@
+[
+  { "step": "ST1", "title": "STEP1 困ったときの資料", "file": "docs/step1-1.pdf" },
+  { "step": "ST2", "title": "STEP2 困ったときの資料", "file": "docs/step2-1.pdf" },
+  { "step": "ST2", "title": "予算の考え方で悩んだときの資料", "file": "docs/step2-2-yosan.pdf" },
+  { "step": "ST3", "title": "STEP3 困ったときの資料", "file": "docs/step3-1.pdf" },
+  { "step": "ST4", "title": "STEP4 困ったときの資料", "file": "docs/step4-1.pdf" },
+  { "step": "ST5", "title": "STEP5 困ったときの資料", "file": "docs/step5-1.pdf" }
+]
