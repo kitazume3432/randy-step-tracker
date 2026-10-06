@@ -1568,9 +1568,27 @@ async function handleSave() {
   }
 }
 
+async function refreshCustomersFromStorage() {
+  try {
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if (res && res.value) {
+      customers = JSON.parse(res.value).filter(c => c.land !== "有");
+    }
+  } catch (e) {
+    // 最新データを取得できない場合は手元のデータのまま続行する
+  }
+}
+
 async function toggleSurveySent(id, tierKey, checked) {
+  const lock = await readLock();
+  if (lock && lock.sessionId !== sessionId) {
+    toast(`現在「${lock.user}」さんが編集中のため、ここでは変更できません。編集が終わってからもう一度お試しください。`, true);
+    render();
+    return;
+  }
+  await refreshCustomersFromStorage();
   const c = customers.find(x => x.id === id);
-  if (!c) return;
+  if (!c) { render(); return; }
   if (!c.surveySent) c.surveySent = { t1:false, t2:false, t3:false };
   c.surveySent[tierKey] = checked;
   const ok = await saveCustomers();
@@ -1579,8 +1597,15 @@ async function toggleSurveySent(id, tierKey, checked) {
 }
 
 async function toggleRenewalSent(id, checked) {
+  const lock = await readLock();
+  if (lock && lock.sessionId !== sessionId) {
+    toast(`現在「${lock.user}」さんが編集中のため、ここでは変更できません。編集が終わってからもう一度お試しください。`, true);
+    render();
+    return;
+  }
+  await refreshCustomersFromStorage();
   const c = customers.find(x => x.id === id);
-  if (!c) return;
+  if (!c) { render(); return; }
   c.renewalReminderSent = checked;
   c.renewalReminderSentFor = checked ? (c.renewalDate || "") : "";
   const ok = await saveCustomers();
