@@ -553,20 +553,28 @@ const COLUMNS = [
   { key:"ST5", tag:"STEP 5", name:"プラン入り・買付・建築申込", accent:"#b53d1f", tint:"#f8d1bf" },
 ];
 
-// STEPごとの案内資料（PDF）。1つのSTEPに複数の資料を置くこともできる。
-// file は index.html から見た相対パス（docs/ フォルダに置いたPDFを指す）。
-// 資料を増やす・差し替えるときは、この配列に行を追加・編集してください。
-const STEP_DOCS = {
-  "ST1": [
-    { title: "STEP1 困ったときの資料", file: "docs/step1-1.pdf" },
-  ],
-  "ST2": [
-    { title: "STEP2 困ったときの資料", file: "docs/step2-1.pdf" },
-  ],
-  "ST3": [
-    { title: "STEP3 困ったときの資料", file: "docs/step3-1.pdf" },
-  ],
-};
+// STEPごとの案内資料（PDF）の一覧。
+// コードは直接編集せず、docs/manifest.json というファイルを編集してください。
+// （Windowsのメモ帳で開いて、行を追加・コピーするだけで資料を増やせます）
+let STEP_DOCS = {};
+
+async function loadStepDocs() {
+  try {
+    const res = await fetch(`docs/manifest.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error("manifest fetch failed: " + res.status);
+    const list = await res.json(); // [{ step:"ST1", title:"...", file:"docs/xxx.pdf" }, ...]
+    const map = {};
+    list.forEach(item => {
+      if (!item || !item.step || !item.file) return;
+      if (!map[item.step]) map[item.step] = [];
+      map[item.step].push({ title: item.title || item.file, file: item.file });
+    });
+    STEP_DOCS = map;
+  } catch (e) {
+    // manifest.json がまだ無い／壊れている場合は、資料なしの状態で動かす
+    STEP_DOCS = {};
+  }
+}
 
 const STAFF_PALETTE = [
   { bg:"#e8f1fb", text:"#2f5f9e" },
@@ -1676,6 +1684,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 });
 document.getElementById("refreshBtn").addEventListener("click", async () => {
   await loadStaffList();
+  await loadStepDocs();
   await loadCustomers();
 });
 
@@ -1731,6 +1740,7 @@ document.getElementById("visitPasteOverlay").addEventListener("click", (e) => {
 
 (async () => {
   await loadStaffList();
+  await loadStepDocs();
   await loadCustomers();
 })();
 

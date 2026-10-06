@@ -1,5 +1,5 @@
 ============================================== 
-Update started: 2026/10/05 16:53:51.53 
+Update started: 2026/10/06  9:56:38.72 
 Folder: Z:\AI\北爪\ツール更新\randy-step-tracker 
 ============================================== 
-Overwrote index.html with: ランディステップトラッカー_資料機能追加版.html 
+Overwrote index.html with: ランディステップトラッカー_資料STEP4-5予算追加版.html 
