@@ -4,6 +4,21 @@
   "construction-tracker-entries": "[{\"id\":\"1790305747946-8gnz61\",\"type\":\"application\",\"category\":\"tochiari\",\"ts\":1790305747000},{\"id\":\"1790305753136-04s284\",\"type\":\"contract\",\"category\":\"tochiari\",\"ts\":1790305753000},{\"id\":\"1790305892601-69a7dd\",\"type\":\"application\",\"category\":\"tochiari\",\"ts\":1784949092000},{\"id\":\"1790305905756-5gp148\",\"type\":\"application\",\"category\":\"fudousan\",\"ts\":1784949105000},{\"id\":\"1790305916204-2ewqy2\",\"type\":\"contract\",\"category\":\"fudousan\",\"ts\":1784949116000},{\"id\":\"1790305917815-xaxjhw\",\"type\":\"contract\",\"category\":\"fudousan\",\"ts\":1784949117000},{\"id\":\"1790305923962-axowj5\",\"type\":\"contract\",\"category\":\"tochiari\",\"ts\":1784949123000},{\"id\":\"1790305924592-yhgrx9\",\"type\":\"contract\",\"category\":\"tochiari\",\"ts\":1784949124000},{\"id\":\"1790305952517-c69a1z\",\"type\":\"application\",\"category\":\"fudousan\",\"ts\":1787627552000},{\"id\":\"1790305954794-2t77bb\",\"type\":\"application\",\"category\":\"tochiari\",\"ts\":1787627554000},{\"id\":\"1790305955118-ywddl9\",\"type\":\"application\",\"category\":\"tochiari\",\"ts\":1787627555000},{\"id\":\"1790305955539-y8bk3h\",\"type\":\"application\",\"category\":\"tochiari\",\"ts\":1787627555000},{\"id\":\"1790305976774-hkml9v\",\"type\":\"contract\",\"category\":\"fudousan\",\"ts\":1787627576000},{\"id\":\"1791008593137-46waxh\",\"type\":\"contract\",\"category\":\"fudousan\",\"ts\":1788416593000},{\"id\":\"1791185601842-6a1se8\",\"type\":\"contract\",\"category\":\"tochiari\",\"ts\":1791185601000}]",
   "randy-lme-webhook-log": [
     {
+      "receivedAt": "2026-10-10T04:54:56.455Z",
+      "signatureHeader": "whsec_DYfnG6UR4lgwWVzcQXbGBWfVgFUj86Vi",
+      "raw": {
+        "events": [
+          {
+            "lmessage_friend_id": 35257406,
+            "line_friend_id": "U7ee791891a9e3bb9732ce2fb24b61a4e",
+            "type": "tag",
+            "action": "remove",
+            "tag_id": 1629254
+          }
+        ]
+      }
+    },
+    {
       "receivedAt": "2026-10-10T04:54:56.454Z",
       "signatureHeader": "whsec_DYfnG6UR4lgwWVzcQXbGBWfVgFUj86Vi",
       "raw": {
