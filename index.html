@@ -50,6 +50,18 @@
     font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 8px rgba(217,80,44,0.25);
   }
   header.top .add-btn:hover { background: var(--orange-deep); }
+  header.top .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+  .pending-btn {
+    padding: 10px 16px; border-radius: 9px; border: 1px solid var(--orange); background: #fff;
+    color: var(--orange-deep); font-size: 13.5px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .pending-btn:hover { background: var(--orange-soft); }
+  .pending-btn .badge-count {
+    background: var(--orange); color: #fff; border-radius: 999px; font-size: 11.5px; font-weight: 800;
+    min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px;
+  }
+  .pending-btn.empty .badge-count { background: var(--gray-bg); color: var(--ink-soft); }
 
   .share-banner {
     display: flex; align-items: center; gap: 8px; background: #fff6ea; border: 1px solid #f0dcb8;
@@ -88,6 +100,22 @@
     font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block;
   }
   .step-docs-empty { color: var(--ink-soft); font-size: 13px; padding: 8px 2px; }
+
+  .modal.wide { width: 560px; max-width: 94vw; max-height: 86vh; overflow-y: auto; }
+  .pending-intake-list { display: flex; flex-direction: column; gap: 12px; margin: 14px 0; }
+  .pending-intake-card {
+    background: var(--orange-pale); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  }
+  .pending-intake-card .pi-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .pending-intake-card .pi-name { font-size: 15.5px; font-weight: 800; color: var(--ink); }
+  .pending-intake-card .pi-time { font-size: 11.5px; color: var(--ink-soft); white-space: nowrap; }
+  .pending-intake-card .pi-contact { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 8px; line-height: 1.6; }
+  .pending-intake-card .pi-note {
+    font-size: 12px; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 7px;
+    padding: 8px 10px; white-space: pre-wrap; line-height: 1.7; margin-bottom: 10px;
+  }
+  .pending-intake-card .pi-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .pending-intake-empty { color: var(--ink-soft); font-size: 13px; padding: 20px 2px; text-align: center; }
 
   .toolbar {
     display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
@@ -288,7 +316,10 @@
         <div class="sub">土地探しから土地契約までの5ステップで、ランディ登録中のお客様（土地なし・削除客）の進捗を確認・更新できます</div>
       </div>
     </div>
-    <button class="add-btn" id="addBtn">＋ お客様を追加</button>
+    <div class="header-actions">
+      <button class="pending-btn empty" id="pendingIntakeBtn" type="button">📋 新着アンケート <span class="badge-count" id="pendingIntakeCount">0</span></button>
+      <button class="add-btn" id="addBtn">＋ お客様を追加</button>
+    </div>
   </header>
 
   <div class="share-banner">⚠️ このボードのデータはリンクを知っている人なら誰でも閲覧・編集できます。1人が編集している間、他の人は編集できないようにロックされます。</div>
@@ -464,6 +495,18 @@
   </div>
 </div>
 
+<!-- エルメ来場アンケートからの新着（確認してから登録） -->
+<div class="overlay hidden" id="pendingIntakeOverlay">
+  <div class="modal wide">
+    <h2>新着アンケート（土地なしの方）</h2>
+    <p class="desc">来場時アンケートで「土地をもっていない」と回答した方が届いています。内容を確認して、登録するかどうか選んでください。</p>
+    <div id="pendingIntakeList" class="pending-intake-list"></div>
+    <div class="modal-actions center">
+      <button class="btn-plain" id="pendingIntakeCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm modal (replaces window.confirm) -->
 <div class="overlay hidden" id="confirmOverlay">
   <div class="modal small">
@@ -541,6 +584,8 @@ if (WORKER_URL) {
 
 const SEED = [{"id": "seed-1", "month": "2025/11/26", "name": "安藤　晃輝様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2025/11/01 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-2", "month": "2025/11/27", "name": "千田　直彦様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2025/11/10 ／ お気に入り登録 0 ／ 問合数 2", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-3", "month": "2025/11/28", "name": "松島　佳祐様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2025/11/15 ／ お気に入り登録 0", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-4", "month": "2025/11/29", "name": "小泉　匡禎様（植原様）", "staff": "島田", "progress": "ST5", "land": "無", "churn": "削除", "note": "登録日 2025/11/22", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-8", "month": "2025/12/16", "name": "河本　剛様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2025/12/01 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-12", "month": "2025/12/21", "name": "桂　有理雄様（裕子様）", "staff": "島田", "progress": "ST5", "land": "無", "churn": "継続", "note": "登録日 2026/02/08 ／ 建築申込 2026/01/15", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-14", "month": "2026/01/10", "name": "今野　卓也様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/10 ／ お気に入り登録 0 ／ 問合数 2", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-15", "month": "2026/01/10", "name": "下田　浩太郎様", "staff": "島田", "progress": "ST1", "land": "無", "churn": "削除", "note": "登録日 2026/01/10 ／ ID発行 2026/01/10", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-16", "month": "2026/01/11", "name": "栗原　みなみ様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/11 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-17", "month": "2026/01/10", "name": "岩崎　智子様", "staff": "山崎", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/01/10 ／ ID発行 2026/01/11 ／ 資金計画 自営業", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-18", "month": "2026/01/10", "name": "関根　彩乃様", "staff": "細野", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/01/10", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-19", "month": "2026/01/11", "name": "坪井　愛様", "staff": "細野", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/11 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-20", "month": "2026/01/10", "name": "髙橋　義大様", "staff": "山﨑", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/10 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-25", "month": "2026/01/11", "name": "林　唯奈様", "staff": "星野", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/01/11", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-34", "month": "2026/01/24", "name": "嶋村　憂太様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/01/25 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-35", "month": "2026/02/01", "name": "高倉　悠里様", "staff": "宮田", "progress": "ST3", "land": "無", "churn": "削除", "note": "登録日 2026/02/01", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-40", "month": "2026/02/06", "name": "澤田　正之様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/02/10 ／ お気に入り登録 1~4 ／ 問合数 2", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-45", "month": "2026/02/11", "name": "木口　幸祐様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/02/17 ／ お気に入り登録 5~ ／ 問合数 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-46", "month": "2026/02/12", "name": "若林　七虹様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/02/21 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-47", "month": "2026/02/13", "name": "金子　杏実様", "staff": "島田", "progress": "ST0", "land": "無", "churn": "削除", "note": "登録日 2026/02/22", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-49", "month": "2026/02/15", "name": "大谷　凱斗様", "staff": "宮田", "progress": "ST3", "land": "無", "churn": "継続", "note": "登録日 2026/02/22 ／ 担当設計 北爪", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-50", "month": "2026/02/16", "name": "丸橋　敏也様", "staff": "細野", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/02/22 ／ ID発行 2026/02/22 ／ 資金計画 2/22", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-53", "month": "2026/02/07", "name": "大川　儀晃様", "staff": "星野", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/02/21 ／ ID発行 2/21 ／ 資金計画 3/20", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-56", "month": "2026/03/07", "name": "春日　結衣様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/03/07 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-65", "month": "2026/03/07", "name": "高橋　星南様", "staff": "宮田", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/03/20 ／ ID発行 3/20 ／ 資金計画 3/21", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-67", "month": "2026/03/07", "name": "森　彩芽様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "削除", "note": "登録日 2026/03/22 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-68", "month": "2026/03/07", "name": "大堀　晃様", "staff": "宮田", "progress": "ST3", "land": "無", "churn": "継続", "note": "登録日 2026/03/22 ／ 担当設計 北爪", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-69", "month": "2026/03/30", "name": "今川　翔太郎様", "staff": "島田", "progress": "ST5", "land": "無", "churn": "継続", "note": "登録日 2026/03/30", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-70", "month": "2026/03/30", "name": "北野　友貴様", "staff": "髙橋", "progress": "ST5", "land": "無", "churn": "継続", "note": "登録日 2026/03/15 ／ 提携先 ㈱ﾀｸﾏ不動産販売", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-71", "month": "2026/04/30", "name": "都丸　裕矢様", "staff": "島田", "progress": "ST1", "land": "無", "churn": "継続", "note": "", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-72", "month": "2026/04/30", "name": "上田　智也様", "staff": "髙橋", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/04/12 ／ ID発行 4/12 ／ 資金計画 4/12", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-73", "month": "2026/04/30", "name": "堀　朋貴様", "staff": "髙橋", "progress": "ST3", "land": "無", "churn": "継続", "note": "登録日 2026/04/12 ／ 担当設計 星野", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-74", "month": "2026/04/30", "name": "伊藤　仁様", "staff": "島田", "progress": "ST1", "land": "無", "churn": "削除", "note": "", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-75", "month": "2026/04/26", "name": "針谷　俊様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/04/05 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-76", "month": "2026/04/26", "name": "新井　渉様", "staff": "髙橋", "progress": "ST0", "land": "無", "churn": "削除", "note": "登録日 2026/04/26", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-77", "month": "2026/05/02", "name": "片桐　剣大様", "staff": "島田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/05/02", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-78", "month": "2026/05/02", "name": "井野　彰紀様", "staff": "宮田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/05/09", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-79", "month": "2026/05/02", "name": "多畑　勇志様", "staff": "宮田", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/05/09 ／ ID発行 5/9", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-80", "month": "2026/05/02", "name": "深澤　佳菜様", "staff": "宮田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/05/09", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-81", "month": "2026/05/02", "name": "二葉　夏樹様", "staff": "細野", "progress": "ST0", "land": "無", "churn": "継続", "note": "", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-82", "month": "2026/05/02", "name": "高橋　元輝様(亜優様)", "staff": "宮田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/05/10 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-83", "month": "2026/05/26", "name": "宮川　弥生様", "staff": "宮田", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/05/31 ／ ID発行 5/31", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-84", "month": "2026/05/26", "name": "土屋　花衣様", "staff": "星野", "progress": "ST1", "land": "無", "churn": "継続", "note": "登録日 2026/05/25 ／ ID発行 5/25 ／ 資金計画 5/25", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-85", "month": "2026/06/14", "name": "島田　結花様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/06/14 ／ お気に入り登録 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-86", "month": "2026/06/14", "name": "倉澤　尚吾様", "staff": "島田", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/06/14 ／ お気に入り登録 5~ ／ 問合数 5~", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-87", "month": "2026/06/14", "name": "小須賀　瑞穂様", "staff": "髙橋", "progress": "ST2", "land": "無", "churn": "継続", "note": "登録日 2026/06/22 ／ お気に入り登録 1~4", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-88", "month": "2026/06/14", "name": "藤井　美久様", "staff": "宮田", "progress": "", "land": "無", "churn": "継続", "note": "登録日 2026/06/20", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}, {"id": "seed-89", "month": "2026/06/14", "name": "加藤　健太様", "staff": "島田", "progress": "ST0", "land": "無", "churn": "継続", "note": "登録日 2026/06/26", "churnReason": "", "lastActivity": "", "randyUrl": "", "surveySent": {"t1": false, "t2": false, "t3": false}, "renewalDate": "", "renewalReminderSent": false, "renewalReminderSentFor": ""}];
 const STORAGE_KEY = "randy-step-tracker-customers";
+const PENDING_INTAKE_KEY = "randy-pending-intake";
+let pendingIntake = [];
 const LOCK_KEY = "randy-step-tracker-lock";
 const LOCK_TTL_MS = 3 * 60 * 1000;
 
@@ -1710,12 +1755,119 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 document.getElementById("refreshBtn").addEventListener("click", async () => {
   await loadStaffList();
   await loadStepDocs();
+  await loadPendingIntake();
   await loadCustomers();
 });
 
 window.addEventListener("error", (e) => {
   console.error("Uncaught error:", e.error || e.message);
 });
+
+/* ==== エルメ（L Message）来場アンケート連携：新着アンケートの確認・登録 ==== */
+async function loadPendingIntake() {
+  try {
+    const res = await window.storage.get(PENDING_INTAKE_KEY, true);
+    pendingIntake = res && res.value ? JSON.parse(res.value) : [];
+  } catch (e) {
+    pendingIntake = [];
+  }
+  renderPendingIntakeBadge();
+}
+
+async function savePendingIntake() {
+  try {
+    const result = await window.storage.set(PENDING_INTAKE_KEY, JSON.stringify(pendingIntake), true);
+    if (!result) { toast("保存に失敗しました。もう一度お試しください。", true); return false; }
+    return true;
+  } catch (e) {
+    toast("保存できませんでした：" + (e && e.message ? e.message : "原因不明のエラー"), true);
+    return false;
+  }
+}
+
+function renderPendingIntakeBadge() {
+  const btn = document.getElementById("pendingIntakeBtn");
+  const countEl = document.getElementById("pendingIntakeCount");
+  if (!btn || !countEl) return;
+  const n = pendingIntake.length;
+  countEl.textContent = String(n);
+  btn.classList.toggle("empty", n === 0);
+}
+
+function renderPendingIntakeList() {
+  const listEl = document.getElementById("pendingIntakeList");
+  if (!listEl) return;
+  if (pendingIntake.length === 0) {
+    listEl.innerHTML = `<div class="pending-intake-empty">現在、確認待ちのアンケートはありません。</div>`;
+    return;
+  }
+  listEl.innerHTML = pendingIntake.map(p => {
+    const contactLines = [];
+    if (p.phone) contactLines.push(`電話: ${p.phone}`);
+    if (p.email) contactLines.push(`メール: ${p.email}`);
+    if (p.address) contactLines.push(`住所: ${p.address}`);
+    return `<div class="pending-intake-card" data-id="${p.id}">
+      <div class="pi-head">
+        <span class="pi-name">${p.name || "（お名前不明）"}</span>
+        <span class="pi-time">${p.receivedAt ? new Date(p.receivedAt).toLocaleString("ja-JP") : ""}</span>
+      </div>
+      <div class="pi-contact">${contactLines.join("　／　") || "連絡先情報なし"}</div>
+      ${p.note ? `<div class="pi-note">${p.note}</div>` : ""}
+      <div class="pi-actions">
+        <button class="btn-plain pi-dismiss" data-id="${p.id}">却下</button>
+        <button class="btn-primary pi-register" data-id="${p.id}">登録する</button>
+      </div>
+    </div>`;
+  }).join("");
+  listEl.querySelectorAll(".pi-dismiss").forEach(el => {
+    el.addEventListener("click", () => dismissPendingIntake(el.dataset.id));
+  });
+  listEl.querySelectorAll(".pi-register").forEach(el => {
+    el.addEventListener("click", () => registerPendingIntake(el.dataset.id));
+  });
+}
+
+function openPendingIntakeModal() {
+  renderPendingIntakeList();
+  document.getElementById("pendingIntakeOverlay").classList.remove("hidden");
+}
+function closePendingIntakeModal() {
+  document.getElementById("pendingIntakeOverlay").classList.add("hidden");
+}
+
+async function dismissPendingIntake(id) {
+  const ok = await askConfirm("却下の確認", "このアンケートを一覧から削除します。よろしいですか？");
+  if (!ok) return;
+  pendingIntake = pendingIntake.filter(p => p.id !== id);
+  await savePendingIntake();
+  renderPendingIntakeBadge();
+  renderPendingIntakeList();
+}
+
+async function registerPendingIntake(id) {
+  const item = pendingIntake.find(p => p.id === id);
+  if (!item) return;
+  pendingIntake = pendingIntake.filter(p => p.id !== id);
+  await savePendingIntake();
+  renderPendingIntakeBadge();
+  closePendingIntakeModal();
+  await openModal(null);
+  if (item.name) document.getElementById("fName").value = item.name;
+  const noteParts = [];
+  if (item.phone) noteParts.push(`電話: ${item.phone}`);
+  if (item.email) noteParts.push(`メール: ${item.email}`);
+  if (item.address) noteParts.push(`住所: ${item.address}`);
+  if (item.note) noteParts.push(item.note);
+  if (noteParts.length) document.getElementById("fNote").value = noteParts.join("\n");
+  toast("エルメのアンケート内容を引き継ぎました。担当・STEPなどを確認して保存してください。");
+}
+
+document.getElementById("pendingIntakeBtn").addEventListener("click", openPendingIntakeModal);
+document.getElementById("pendingIntakeCloseBtn").addEventListener("click", closePendingIntakeModal);
+document.getElementById("pendingIntakeOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "pendingIntakeOverlay") closePendingIntakeModal();
+});
+/* ==== ここまで ==== */
 
 /* ==== 外部ツールからの引き継ぎ登録（不要ならこのブロックと呼び出しボタンを削除でOK） ====
    来場アンケート管理側で「ランディへ」ボタンを押すと、お客様情報がクリップボードにコピーされます。
@@ -1766,6 +1918,7 @@ document.getElementById("visitPasteOverlay").addEventListener("click", (e) => {
 (async () => {
   await loadStaffList();
   await loadStepDocs();
+  await loadPendingIntake();
   await loadCustomers();
 })();
 
