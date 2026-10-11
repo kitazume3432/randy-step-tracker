@@ -421,6 +421,8 @@
     </div>
     <label>ランディ 顧客詳細URL</label>
     <input type="text" id="fRandyUrl" placeholder="https://...">
+    <label>希望エリア</label>
+    <input type="text" id="fArea" placeholder="例）高崎市 新保町">
     <label>アンケート送信状況</label>
     <div class="survey-checks">
       <label class="chk"><input type="checkbox" id="fSurvey1"> ①2週間</label>
@@ -1535,7 +1537,7 @@ async function openModal(id) {
   const isNew = !id;
   document.getElementById("modalTitle").textContent = isNew ? "お客様を追加" : "お客様情報を編集";
   document.getElementById("deleteBtn").classList.toggle("hidden", isNew);
-  const c = isNew ? { id: "", name:"", staff:"", month:"", progress:"", churn:"継続", note:"", churnReason:"", lastActivity:"", renewalDate:"", renewalReminderSent:false, renewalReminderSentFor:"", randyUrl:"", surveySent:{t1:false,t2:false,t3:false} }
+  const c = isNew ? { id: "", name:"", staff:"", month:"", progress:"", churn:"継続", note:"", churnReason:"", lastActivity:"", renewalDate:"", renewalReminderSent:false, renewalReminderSentFor:"", randyUrl:"", area:"", surveySent:{t1:false,t2:false,t3:false} }
                   : customers.find(x => x.id === id);
   document.getElementById("editId").value = c.id || "";
   document.getElementById("fName").value = c.name || "";
@@ -1549,6 +1551,7 @@ async function openModal(id) {
   document.getElementById("fRenewalDate").value = toDateInputValue(c.renewalDate);
   document.getElementById("fRenewalSent").checked = renewalReminderResolved(c);
   document.getElementById("fRandyUrl").value = c.randyUrl || "";
+  document.getElementById("fArea").value = c.area || "";
   const sv = c.surveySent || {};
   document.getElementById("fSurvey1").checked = !!sv.t1;
   document.getElementById("fSurvey2").checked = !!sv.t2;
@@ -1581,6 +1584,7 @@ async function handleSave() {
     lastActivity: document.getElementById("fLastActivity").value.trim(),
     renewalDate: document.getElementById("fRenewalDate").value.trim(),
     randyUrl: document.getElementById("fRandyUrl").value.trim(),
+    area: document.getElementById("fArea").value.trim(),
     surveySent: {
       t1: document.getElementById("fSurvey1").checked,
       t2: document.getElementById("fSurvey2").checked,
@@ -1806,6 +1810,7 @@ function renderPendingIntakeList() {
     if (p.phone) contactLines.push(`電話: ${p.phone}`);
     if (p.email) contactLines.push(`メール: ${p.email}`);
     if (p.address) contactLines.push(`住所: ${p.address}`);
+    if (p.area) contactLines.push(`希望エリア: ${p.area}`);
     return `<div class="pending-intake-card" data-id="${p.id}">
       <div class="pi-head">
         <span class="pi-name">${p.name || "（お名前不明）"}</span>
@@ -1857,11 +1862,7 @@ async function registerPendingIntake(id) {
   closePendingIntakeModal();
   await openModal(null);
   if (item.name) document.getElementById("fName").value = item.name;
-  const noteParts = [];
-  if (item.phone) noteParts.push(`電話: ${item.phone}`);
-  if (item.email) noteParts.push(`メール: ${item.email}`);
-  if (item.address) noteParts.push(`住所: ${item.address}`);
-  if (noteParts.length) document.getElementById("fNote").value = noteParts.join("\n");
+  if (item.area) document.getElementById("fArea").value = item.area;
   // 登録日・最終活動日に、来場時アンケートに回答した日を初期値として入れる
   // （カレンダーから日付を選び直すことも引き続きできます）
   if (item.receivedAt) {
