@@ -1844,6 +1844,10 @@ async function dismissPendingIntake(id) {
   renderPendingIntakeList();
 }
 
+function pad2(n) { return String(n).padStart(2, "0"); }
+function formatDateSlash(d) { return `${d.getFullYear()}/${pad2(d.getMonth() + 1)}/${pad2(d.getDate())}`; }
+function formatDateDash(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+
 async function registerPendingIntake(id) {
   const item = pendingIntake.find(p => p.id === id);
   if (!item) return;
@@ -1857,8 +1861,16 @@ async function registerPendingIntake(id) {
   if (item.phone) noteParts.push(`電話: ${item.phone}`);
   if (item.email) noteParts.push(`メール: ${item.email}`);
   if (item.address) noteParts.push(`住所: ${item.address}`);
-  if (item.note) noteParts.push(item.note);
   if (noteParts.length) document.getElementById("fNote").value = noteParts.join("\n");
+  // 登録日・最終活動日に、来場時アンケートに回答した日を初期値として入れる
+  // （カレンダーから日付を選び直すことも引き続きできます）
+  if (item.receivedAt) {
+    const answeredDate = new Date(item.receivedAt);
+    if (!isNaN(answeredDate)) {
+      document.getElementById("fMonth").value = formatDateSlash(answeredDate);
+      document.getElementById("fLastActivity").value = formatDateDash(answeredDate);
+    }
+  }
   toast("エルメのアンケート内容を引き継ぎました。担当・STEPなどを確認して保存してください。");
 }
 
