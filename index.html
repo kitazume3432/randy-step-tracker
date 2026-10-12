@@ -110,6 +110,11 @@
   .pending-intake-card .pi-name { font-size: 15.5px; font-weight: 800; color: var(--ink); }
   .pending-intake-card .pi-time { font-size: 11.5px; color: var(--ink-soft); white-space: nowrap; }
   .pending-intake-card .pi-contact { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 8px; line-height: 1.6; }
+  .pending-intake-card .pi-land-status {
+    display: inline-block; font-size: 11.5px; font-weight: 700; color: var(--orange);
+    background: #fff; border: 1px solid var(--orange); border-radius: 6px;
+    padding: 2px 8px; margin-bottom: 8px;
+  }
   .pending-intake-card .pi-note {
     font-size: 12px; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 7px;
     padding: 8px 10px; white-space: pre-wrap; line-height: 1.7; margin-bottom: 10px;
@@ -1816,6 +1821,7 @@ function renderPendingIntakeList() {
         <span class="pi-name">${p.name || "（お名前不明）"}</span>
         <span class="pi-time">${p.receivedAt ? new Date(p.receivedAt).toLocaleString("ja-JP") : ""}</span>
       </div>
+      ${p.landStatus ? `<div class="pi-land-status">土地: ${p.landStatus}</div>` : ""}
       <div class="pi-contact">${contactLines.join("　／　") || "連絡先情報なし"}</div>
       ${p.note ? `<div class="pi-note">${p.note}</div>` : ""}
       <div class="pi-actions">
