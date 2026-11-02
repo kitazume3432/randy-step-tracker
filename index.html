@@ -122,6 +122,15 @@
   .pending-intake-card .pi-actions { display: flex; gap: 8px; justify-content: flex-end; }
   .pending-intake-empty { color: var(--ink-soft); font-size: 13px; padding: 20px 2px; text-align: center; }
 
+  .hagaki-drop { display: block; border: 2px dashed var(--line); border-radius: 10px; padding: 18px 12px; text-align: center; background: var(--orange-pale); color: var(--ink-soft); font-size: 13px; cursor: pointer; margin: 4px 0 6px; }
+  .hagaki-drop.over { border-color: var(--orange); background: #fff; }
+  .hagaki-sec h3 { font-size: 13px; margin: 14px 0 6px; color: var(--ink); }
+  .hagaki-summary { font-size: 12.5px; color: var(--ink-soft); line-height: 1.8; margin-top: 10px; }
+  .hagaki-row { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px; background: #fff; line-height: 1.5; }
+  .hagaki-row input[type="checkbox"] { margin-top: 3px; cursor: pointer; }
+  .hagaki-warn { color: #b7392f; font-size: 11px; font-weight: 600; }
+  .hagaki-list-plain { font-size: 12px; color: var(--ink-soft); line-height: 1.7; word-break: break-all; }
+
   .toolbar {
     display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
     background: var(--card); border: 1px solid var(--line); border-radius: 10px;
@@ -355,6 +364,7 @@
     <button class="ghost" id="addStaffBtn">＋ メンバー追加</button>
     <button class="ghost" id="removeStaffBtn">－ メンバー削除</button>
     <button class="ghost" id="pasteVisitBtn">📋 来場データを貼り付けて登録</button>
+    <button class="ghost" id="hagakiBtn">📮 往復はがきの結果を取り込む</button>
     <button class="ghost" id="refreshBtn">最新の状態に更新</button>
     <button class="ghost" id="resetBtn">絞り込みをリセット</button>
     <span class="count" id="totalCount"></span>
@@ -510,6 +520,23 @@
     <div id="pendingIntakeList" class="pending-intake-list"></div>
     <div class="modal-actions center">
       <button class="btn-plain" id="pendingIntakeCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 往復はがきの結果（Excel）を取り込んで、削除客へ反映する -->
+<div class="overlay hidden" id="hagakiOverlay">
+  <div class="modal wide">
+    <h2>往復はがきの結果を取り込む</h2>
+    <p class="desc">往復はがきを管理しているExcelファイルを選ぶか、下の枠にドラッグしてください。「顧客名」と「往復ハガキ出すかどうか」の列を読み取り、お名前が一致したお客様だけに反映します（ランディにいない方は無視します）。反映する前に、必ず内容を確認できます。</p>
+    <label class="hagaki-drop" id="hagakiDrop">
+      <input type="file" id="hagakiFile" accept=".xlsx,.xlsm,.xls" style="display:none;">
+      <span id="hagakiDropText">📄 ここをクリックしてExcelファイルを選ぶ（またはドラッグ）</span>
+    </label>
+    <div id="hagakiResult"></div>
+    <div class="modal-actions center">
+      <button class="btn-plain" id="hagakiCloseBtn">閉じる</button>
+      <button class="btn-primary" id="hagakiApplyBtn" style="display:none;">選んだ方を削除にする</button>
     </div>
   </div>
 </div>
@@ -1940,6 +1967,254 @@ document.getElementById("visitPasteOverlay").addEventListener("click", (e) => {
   await loadPendingIntake();
   await loadCustomers();
 })();
+
+/* ==== 往復はがき（Excel）の取り込み ====
+   Excelの「顧客名」と「往復ハガキ出すかどうか」の列を読み取り、お名前が一致したお客様のうち
+   「削除客へ変更」と判定された方を、確認のうえ「削除」にします。
+   「そのまま（現状維持）」や「ハガキ出す」「OBへ変更」は変更しません。 */
+let hagakiPlan = null;
+
+function loadXlsxLib() {
+  if (window.XLSX) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("Excelを読み取る部品を読み込めませんでした。インターネットの接続を確認してください。"));
+    document.head.appendChild(s);
+  });
+}
+
+function hagakiEsc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+}
+
+// 表記ゆれ（異体字）をそろえるための対応表
+const KANJI_VARIANTS = { "髙": "高", "﨑": "崎", "𠮷": "吉", "邊": "辺", "邉": "辺", "齋": "斎", "齊": "斉", "澤": "沢", "國": "国", "濱": "浜", "嶋": "島", "德": "徳", "廣": "広", "櫻": "桜" };
+function unifyKanji(s) { return Array.from(s).map(ch => KANJI_VARIANTS[ch] || ch).join(""); }
+
+// 名前の照合用キー：空白・「様」を除き、異体字をそろえる。夫婦など複数名のときは先頭の方で照合する
+function hagakiNameKey(raw) {
+  let s = String(raw || "").normalize("NFKC");
+  s = s.split(/[・、,，\/／&＆\n]/)[0];
+  s = s.replace(/[\s　]/g, "").replace(/(様|さん|殿)$/, "");
+  return unifyKanji(s);
+}
+function hagakiStaffKey(raw) {
+  return unifyKanji(String(raw || "").normalize("NFKC").replace(/[\s　]/g, ""));
+}
+
+function classifyHagakiDecision(v) {
+  const s = String(v || "").normalize("NFKC").replace(/\s/g, "");
+  if (s.includes("削除客")) return "delete";
+  if (s.includes("そのまま") || s.includes("現状維持")) return "keep";
+  return "other";
+}
+
+function parseHagakiWorkbook(wb) {
+  const rows = [];
+  const usedSheets = [];
+  for (const sheetName of wb.SheetNames) {
+    const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: "", raw: false });
+    let hIdx = -1, nameCol = -1, decCol = -1, staffCol = -1;
+    for (let i = 0; i < Math.min(aoa.length, 15); i++) {
+      const cells = (aoa[i] || []).map(v => String(v).replace(/\s/g, ""));
+      const n = cells.findIndex(v => v.includes("顧客名"));
+      const d = cells.findIndex(v => v.includes("往復ハガキ") || v.includes("往復はがき"));
+      if (n >= 0 && d >= 0) {
+        hIdx = i; nameCol = n; decCol = d;
+        staffCol = cells.findIndex(v => v === "担当");
+        break;
+      }
+    }
+    if (hIdx < 0) continue;
+    usedSheets.push(sheetName);
+    for (let i = hIdx + 1; i < aoa.length; i++) {
+      const r = aoa[i] || [];
+      const name = String(r[nameCol] || "").trim();
+      if (!name) continue;
+      rows.push({
+        sheet: sheetName,
+        name,
+        decisionRaw: String(r[decCol] || "").trim(),
+        staff: staffCol >= 0 ? String(r[staffCol] || "").trim() : "",
+      });
+    }
+  }
+  return { rows, usedSheets };
+}
+
+function buildHagakiPlan(rows) {
+  const byKey = new Map();
+  customers.forEach(c => {
+    const k = hagakiNameKey(c.name);
+    if (!k) return;
+    if (!byKey.has(k)) byKey.set(k, []);
+    byKey.get(k).push(c);
+  });
+  const plan = { del: [], delDone: [], keep: [], notFound: [], maybe: [], ambiguous: [], other: 0 };
+  const seen = new Set();
+  rows.forEach(r => {
+    const kind = classifyHagakiDecision(r.decisionRaw);
+    if (kind === "other") { plan.other++; return; }
+    const key = hagakiNameKey(r.name);
+    if (!key) return;
+    const hits = byKey.get(key) || [];
+    if (hits.length > 1) { plan.ambiguous.push({ row: r, kind, cands: hits }); return; }
+    if (hits.length === 1) {
+      const c = hits[0];
+      if (seen.has(c.id + kind)) return; // 同じ方がExcelに複数回出てきても1回だけ数える
+      seen.add(c.id + kind);
+      const item = {
+        row: r, c,
+        staffWarn: !!(r.staff && c.staff && hagakiStaffKey(r.staff) !== hagakiStaffKey(c.staff)),
+        inPlan: c.progress === "ST5",
+      };
+      if (kind === "keep") plan.keep.push(item);
+      else if (isChurned(c)) plan.delDone.push(item);
+      else plan.del.push(item);
+      return;
+    }
+    // 完全一致なし：片方がもう片方を含む名前（例：名字違い・2名分の表記など）は「要確認」にする
+    if (kind === "delete" && key.length >= 3) {
+      const near = customers.filter(c => {
+        const k = hagakiNameKey(c.name);
+        return k && k.length >= 3 && k !== key && (k.includes(key) || key.includes(k)) && !isChurned(c);
+      });
+      if (near.length) { plan.maybe.push({ row: r, cands: near }); return; }
+    }
+    plan.notFound.push({ row: r, kind });
+  });
+  return plan;
+}
+
+function renderHagakiPlan(meta) {
+  const p = hagakiPlan;
+  const el = document.getElementById("hagakiResult");
+  const applyBtn = document.getElementById("hagakiApplyBtn");
+  let html = `<div class="hagaki-summary">読み取ったシート：${hagakiEsc(meta.usedSheets.join("、"))}（${meta.total}行）<br>
+    削除にする候補：<b>${p.del.length}</b>人／要確認：<b>${p.maybe.length}</b>人／現状維持：${p.keep.length}人／すでに削除済み：${p.delDone.length}人／ランディに見つからない：${p.notFound.length}人</div>`;
+
+  if (p.del.length) {
+    html += `<div class="hagaki-sec"><h3>「削除客へ変更」→ 削除にする方（チェックを外すと対象から外れます）</h3>`;
+    p.del.forEach(it => {
+      const warns = [];
+      if (it.staffWarn) warns.push(`⚠ 担当が違います（ランディ：${hagakiEsc(it.c.staff)}／Excel：${hagakiEsc(it.row.staff)}）`);
+      if (it.inPlan) warns.push("⚠ プラン入り（STEP5）済みの方です");
+      html += `<label class="hagaki-row"><input type="checkbox" class="hagaki-chk" data-id="${hagakiEsc(it.c.id)}" ${it.inPlan ? "" : "checked"}>
+        <span><b>${hagakiEsc(it.c.name)}</b>　担当：${hagakiEsc(it.c.staff || "未設定")}${warns.length ? `<br><span class="hagaki-warn">${warns.join("　")}</span>` : ""}</span></label>`;
+    });
+    html += `</div>`;
+  }
+  if (p.maybe.length) {
+    html += `<div class="hagaki-sec"><h3>お名前が少し違う方（同じ方なら、チェックを入れてください）</h3>`;
+    p.maybe.forEach(it => {
+      it.cands.forEach(c => {
+        html += `<label class="hagaki-row"><input type="checkbox" class="hagaki-chk" data-id="${hagakiEsc(c.id)}">
+          <span>Excel：<b>${hagakiEsc(it.row.name)}</b> ／ ランディ：<b>${hagakiEsc(c.name)}</b>（担当：${hagakiEsc(c.staff || "未設定")}）</span></label>`;
+      });
+    });
+    html += `</div>`;
+  }
+  if (p.ambiguous.length) {
+    html += `<div class="hagaki-sec"><h3>同じお名前の方が複数います（ここでは変更しません。手で確認してください）</h3>
+      <div class="hagaki-list-plain">${p.ambiguous.map(it => hagakiEsc(it.row.name)).join("、")}</div></div>`;
+  }
+  if (p.notFound.length) {
+    const delNames = p.notFound.filter(x => x.kind === "delete").map(x => hagakiEsc(x.row.name));
+    const keepNames = p.notFound.filter(x => x.kind === "keep").map(x => hagakiEsc(x.row.name));
+    html += `<details class="hagaki-sec"><summary style="font-size:12.5px;color:var(--ink-soft);cursor:pointer;margin-top:12px;">ランディに見つからなかった方（土地ありなど。何もしません）${p.notFound.length}人</summary>
+      <div class="hagaki-list-plain" style="margin-top:6px;">${delNames.length ? `<b>削除客へ変更：</b>${delNames.join("、")}<br>` : ""}${keepNames.length ? `<b>現状維持：</b>${keepNames.join("、")}` : ""}</div></details>`;
+  }
+  if (!p.del.length && !p.maybe.length) {
+    html += `<div class="pending-intake-empty">削除にする方はいませんでした。</div>`;
+  }
+  el.innerHTML = html;
+  applyBtn.style.display = (p.del.length || p.maybe.length) ? "" : "none";
+}
+
+async function handleHagakiFile(file) {
+  if (!file) return;
+  const txt = document.getElementById("hagakiDropText");
+  const resultEl = document.getElementById("hagakiResult");
+  document.getElementById("hagakiApplyBtn").style.display = "none";
+  txt.textContent = `読み込み中… ${file.name}`;
+  resultEl.innerHTML = "";
+  try {
+    await loadXlsxLib();
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array" });
+    const { rows, usedSheets } = parseHagakiWorkbook(wb);
+    if (!rows.length) {
+      txt.textContent = "📄 ここをクリックしてExcelファイルを選ぶ（またはドラッグ）";
+      resultEl.innerHTML = `<div class="hagaki-summary" style="color:#b7392f;">「顧客名」と「往復ハガキ出すかどうか」の列が見つかりませんでした。ファイルや表の見出しをご確認ください。</div>`;
+      return;
+    }
+    await refreshCustomersFromStorage();
+    hagakiPlan = buildHagakiPlan(rows);
+    txt.textContent = `📄 ${file.name}（別のファイルを選ぶ場合はここをクリック）`;
+    renderHagakiPlan({ usedSheets, total: rows.length });
+  } catch (e) {
+    txt.textContent = "📄 ここをクリックしてExcelファイルを選ぶ（またはドラッグ）";
+    resultEl.innerHTML = `<div class="hagaki-summary" style="color:#b7392f;">読み込めませんでした：${hagakiEsc(e && e.message ? e.message : e)}</div>`;
+  }
+}
+
+async function applyHagakiPlan() {
+  const lock = await readLock();
+  if (lock && lock.sessionId !== sessionId) {
+    toast(`現在「${lock.user}」さんが編集中のため、反映できません。編集が終わってからもう一度お試しください。`, true);
+    return;
+  }
+  const ids = Array.from(document.querySelectorAll("#hagakiResult .hagaki-chk:checked")).map(el => el.dataset.id);
+  if (!ids.length) { toast("削除にする方が選ばれていません。", true); return; }
+  const ok = await askConfirm("往復はがきの反映", `選んだ${ids.length}人を「削除」にします。よろしいですか？`);
+  if (!ok) return;
+  await refreshCustomersFromStorage();
+  let n = 0;
+  ids.forEach(id => {
+    const c = customers.find(x => x.id === id);
+    if (c && !isChurned(c)) {
+      c.churn = "削除";
+      if (!c.churnReason) c.churnReason = "往復はがき（削除客へ変更）";
+      n++;
+    }
+  });
+  const saved = await saveCustomers();
+  render();
+  closeHagakiModal();
+  if (saved) toast(`${n}人を「削除」にしました。`);
+}
+
+function openHagakiModal() {
+  hagakiPlan = null;
+  document.getElementById("hagakiFile").value = "";
+  document.getElementById("hagakiDropText").textContent = "📄 ここをクリックしてExcelファイルを選ぶ（またはドラッグ）";
+  document.getElementById("hagakiResult").innerHTML = "";
+  document.getElementById("hagakiApplyBtn").style.display = "none";
+  document.getElementById("hagakiOverlay").classList.remove("hidden");
+}
+function closeHagakiModal() {
+  document.getElementById("hagakiOverlay").classList.add("hidden");
+}
+
+document.getElementById("hagakiBtn").addEventListener("click", openHagakiModal);
+document.getElementById("hagakiCloseBtn").addEventListener("click", closeHagakiModal);
+document.getElementById("hagakiApplyBtn").addEventListener("click", applyHagakiPlan);
+document.getElementById("hagakiOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "hagakiOverlay") closeHagakiModal();
+});
+document.getElementById("hagakiFile").addEventListener("change", (e) => handleHagakiFile(e.target.files[0]));
+(function () {
+  const drop = document.getElementById("hagakiDrop");
+  ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", (e) => {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleHagakiFile(f);
+  });
+})();
+/* ==== ここまで（往復はがき） ==== */
 
 // ---- タブ切り替え（ステップ管理 / 申込・契約） ----
 (function () {

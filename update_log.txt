@@ -1,5 +1,5 @@
 ============================================== 
-Update started: 2026/10/12 16:30:35.16 
-Folder: Z:\AI\北爪\ツール更新\randy-step-tracker 
+Update started: 2026/11/02 12:00:12.55 
+Folder: W:\AI\北爪\ツール更新\randy-step-tracker 
 ============================================== 
-Overwrote index.html with: ランディステップトラッカー_希望エリア欄追加版 (1).html 
+Overwrote index.html with: ランディステップトラッカー_往復はがき取り込み版.html 
